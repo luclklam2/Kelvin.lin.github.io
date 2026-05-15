@@ -290,8 +290,14 @@
           <input id="eventDate" type="date" />
         </div>
         <div>
-          <label>時間</label>
+          <label>開始時間</label>
           <input id="eventTime" type="time" />
+        </div>
+      </div>
+      <div class="row two">
+        <div>
+          <label>完結時間</label>
+          <input id="eventEndTime" type="time" />
         </div>
       </div>
       <div class="row">
@@ -327,6 +333,7 @@
 
   <script>
     const storageKey = "calendar_2026_may_june";
+    const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxyRtU_Sht4DUax7slKOX5x1AzRF5JO0cQAzDhtZnUv5grL0hvzI3QFNdWML9pCmXDJ/exec";
     const monthNames = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
     const initialEvents = [
       { date: "2026-05-11", time: "10:00", name: "Taekwondo", type: "Taekwondo", color: "#44a2ff" },
@@ -364,12 +371,36 @@
     }
     function saveEvents() { localStorage.setItem(storageKey, JSON.stringify(events)); }
 
+    async function syncToSheet(action, eventObj) {
+      try {
+        await fetch(SHEET_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action,
+            event: {
+              ...eventObj,
+              location: eventObj.location || eventObj.type || ""
+            }
+          })
+        });
+      } catch (err) {
+        console.error("Google Sheet sync failed:", err);
+      }
+    }
+
     function formatCNTime(t) {
       if (!t) return "";
       const [h, m] = t.split(":").map(Number);
       const isPM = h >= 12;
       const hh = h % 12 === 0 ? 12 : h % 12;
       return `${isPM ? "下午" : "上午"}${hh}:${String(m).padStart(2, "0")}`;
+    }
+
+    function formatTimeRange(start, end) {
+      if (!start && !end) return "";
+      if (start && end) return `${formatCNTime(start)}-${formatCNTime(end)}`;
+      return formatCNTime(start || end);
     }
 
     function monthGrid(dateObj) {
@@ -422,7 +453,7 @@
           row.innerHTML = `
             <i class="dot" style="background:${e.color || "#72d572"}"></i>
             <span class="event-name">${e.name}</span>
-            <span class="event-time">${formatCNTime(e.time)}</span>
+            <span class="event-time">${formatTimeRange(e.time, e.endTime)}</span>
           `;
           row.addEventListener("click", (ev) => {
             ev.stopPropagation();
@@ -446,6 +477,7 @@
       const title = document.getElementById("modalTitle");
       const date = document.getElementById("eventDate");
       const time = document.getElementById("eventTime");
+      const endTime = document.getElementById("eventEndTime");
       const name = document.getElementById("eventName");
       const type = document.getElementById("eventType");
       const color = document.getElementById("eventColor");
@@ -455,6 +487,7 @@
         title.textContent = "編輯行程";
         date.value = e.date;
         time.value = e.time || "";
+        endTime.value = e.endTime || "";
         name.value = e.name || "";
         type.value = e.type || "";
         color.value = e.color || "#72d572";
@@ -463,6 +496,7 @@
         title.textContent = "新增行程";
         date.value = selectedDate || iso(new Date(current.getFullYear(), current.getMonth(), 1));
         time.value = "";
+        endTime.value = "";
         name.value = "";
         type.value = "";
         color.value = "#72d572";
@@ -477,9 +511,10 @@
       editingId = null;
     }
 
-    document.getElementById("saveBtn").addEventListener("click", () => {
+    document.getElementById("saveBtn").addEventListener("click", async () => {
       const date = document.getElementById("eventDate").value;
       const time = document.getElementById("eventTime").value;
+      const endTime = document.getElementById("eventEndTime").value;
       const name = document.getElementById("eventName").value.trim();
       const type = document.getElementById("eventType").value.trim();
       const color = document.getElementById("eventColor").value;
@@ -489,21 +524,37 @@
         return;
       }
 
+      if (time && endTime && endTime <= time) {
+        alert("完結時間要遲過開始時間");
+        return;
+      }
+
+      let payloadEvent;
       if (editingId) {
-        events = events.map(e => e.id === editingId ? { ...e, date, time, name, type, color } : e);
+        events = events.map(e => {
+          if (e.id !== editingId) return e;
+          payloadEvent = { ...e, date, time, endTime, name, type, color };
+          return payloadEvent;
+        });
       } else {
-        events.push({ id: uid(), date, time, name, type, color });
+        payloadEvent = { id: uid(), date, time, endTime, name, type, color };
+        events.push(payloadEvent);
       }
 
       saveEvents();
+      await syncToSheet("upsert", payloadEvent);
       closeModal();
       render();
     });
 
-    document.getElementById("deleteBtn").addEventListener("click", () => {
+    document.getElementById("deleteBtn").addEventListener("click", async () => {
       if (!editingId) return;
+      const deletingEvent = events.find(e => e.id === editingId);
       events = events.filter(e => e.id !== editingId);
       saveEvents();
+      if (deletingEvent) {
+        await syncToSheet("delete", deletingEvent);
+      }
       closeModal();
       render();
     });
