@@ -1,17 +1,540 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Schedule 行事曆</title>
-<style>
-:root{color-scheme:dark;--bg:#161719;--card:#202227;--card2:#292c34;--line:#393d47;--txt:#f7f8fb;--muted:#9aa3b2;--red:#ff3545;--blue:#329dff;--green:#65ca63;--yellow:#f4dc20;--purple:#b65fe0;--pink:#ed5b95;--orange:#ff9b6a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif}.app{max-width:1720px;margin:auto;padding:16px 20px 28px}.top{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin-bottom:14px}h1{margin:0;color:var(--muted);font-size:clamp(20px,2vw,25px)}h1 b{color:#fff}.tabs{display:grid;grid-template-columns:repeat(3,1fr);width:340px;height:30px;border:1px solid #4a4d56;border-radius:8px;overflow:hidden;background:#3b3d43}.tabs span{display:grid;place-items:center;border-right:1px solid #555963;font-weight:800}.tabs span:last-child{border-right:0}.tabs .on{background:#73757d}.actions{justify-self:end;display:flex;gap:8px;align-items:center}button,input,select,textarea{font:inherit}button{cursor:pointer}.icon,.text,.primary,.secondary{min-height:36px;border-radius:8px;font-weight:850}.icon{width:36px;border:0;background:transparent;color:var(--red);font-size:24px}.text{padding:0 10px;border:0;background:transparent;color:var(--red)}.primary{padding:0 14px;border:0;background:var(--red);color:#fff}.secondary{padding:0 12px;border:1px solid var(--line);background:var(--card2);color:#fff}.bar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--card)}.hint{margin:0;color:var(--muted);font-size:13px}.calendar{display:grid;grid-template-columns:repeat(7,minmax(135px,1fr));border-top:1px solid var(--line)}.weekday{padding:0 8px 7px;color:var(--muted);font-size:17px;font-weight:850}.weekday:nth-child(6){color:var(--red)}.day{min-height:136px;padding:9px 8px;border-top:1px solid var(--line);border-left:1px solid rgba(255,255,255,.03);background:#1a1b1f;overflow:hidden}.day.weekend{background:#202126}.day.outside{opacity:.55}.dateRow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}.date{font-weight:900}.today .date{display:grid;place-items:center;width:31px;height:31px;margin-left:-4px;border-radius:50%;background:var(--red);color:#111}.addDay{display:grid;place-items:center;width:25px;height:25px;border:1px solid var(--line);border-radius:7px;background:rgba(255,255,255,.03);color:var(--muted);font-weight:900}.event{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:6px;align-items:center;width:100%;margin:4px 0;padding:0;border:0;background:transparent;color:#fff;text-align:left}.dot{width:8px;height:8px;border-radius:50%}.eventTitle{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:clamp(10px,.72vw,12px);font-weight:850}.eventTime{white-space:nowrap;color:#b7c1cf;font-size:clamp(9px,.65vw,11px);font-weight:750}.modal{position:fixed;inset:0;display:none;place-items:center;padding:18px;background:rgba(0,0,0,.6);z-index:5}.modal.open{display:grid}.dialog{width:min(100%,560px);border:1px solid var(--line);border-radius:10px;background:var(--card);box-shadow:0 24px 80px #000}.dh,.df{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}.df{border-top:1px solid var(--line);border-bottom:0}.dialog h2{margin:0;font-size:19px}form{padding:16px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:grid;gap:6px}.full{grid-column:1/-1}label{color:var(--muted);font-size:12px;font-weight:850}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:8px;background:var(--card2);color:#fff;outline:0}input,select{height:40px;padding:0 11px}textarea{min-height:78px;padding:10px 11px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--red)}.danger{color:#ff8b94;border-color:rgba(255,53,69,.35);background:rgba(255,53,69,.08)}.right{display:flex;gap:8px;margin-left:auto}.toast{position:fixed;right:18px;bottom:18px;display:none;max-width:420px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#30333b;font-weight:750;z-index:8}.toast.show{display:block}@media(max-width:920px){.app{padding:14px}.top{grid-template-columns:1fr}.tabs{width:100%;max-width:370px}.actions{justify-self:stretch;justify-content:space-between}.calendar{display:block;border-top:0}.weekday{display:none}.day{display:none}.day.has,.day.today{display:block;min-height:0;margin-bottom:10px;border:1px solid var(--line);border-radius:8px;background:var(--card)}.eventTitle,.eventTime{font-size:14px}.fields{grid-template-columns:1fr}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026年5-6月行事曆</title>
+  <style>
+    :root {
+      --bg: #12141b;
+      --bg-soft: #181b24;
+      --line: #2a2f3a;
+      --text: #e9edf7;
+      --muted: #8290ad;
+      --accent: #ff3c4d;
+      --blue: #44a2ff;
+      --green: #72d572;
+      --yellow: #f4e65a;
+      --purple: #c680ff;
+      --pink: #ff79c6;
+      --orange: #ffae7d;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 500px at 50% -10%, #1a1f2f 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .title {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .center-tabs {
+      display: inline-flex;
+      border: 1px solid #4a4f5a;
+      border-radius: 9px;
+      overflow: hidden;
+      background: #2e323d;
+      justify-self: center;
+    }
+
+    .center-tabs button {
+      width: 110px;
+      padding: 8px 0;
+      border: none;
+      color: #d9deea;
+      background: transparent;
+      cursor: default;
+      font-weight: 700;
+      opacity: 0.75;
+    }
+
+    .center-tabs button.active {
+      background: #5d616b;
+      opacity: 1;
+    }
+
+    .actions {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 28px;
+      color: var(--accent);
+      user-select: none;
+    }
+
+    .actions button {
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-size: 28px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px 8px;
+    }
+
+    .actions .today {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .dow, .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .dow div {
+      padding: 10px 8px;
+      color: #8ea0c4;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-size: 34px;
+      font-weight: 800;
+    }
+
+    .dow div.friday { color: var(--accent); }
+
+    .cell {
+      min-height: 190px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: rgba(16, 19, 27, 0.72);
+      padding: 8px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .cell:nth-child(7n+1) { border-left: 1px solid var(--line); }
+
+    .date-num {
+      font-size: 34px;
+      font-weight: 800;
+      color: #f1f4ff;
+      margin-bottom: 8px;
+      display: inline-block;
+      padding: 0 4px;
+      border-radius: 999px;
+    }
+
+    .other-month .date-num { color: #3e495f; }
+    .today-mark .date-num { background: var(--accent); color: #fff; }
+
+    .event {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      margin: 4px 0;
+      border-radius: 7px;
+      padding: 2px 4px;
+    }
+
+    .event:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .event-name {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: 700;
+    }
+
+    .event-time {
+      color: #abc0e4;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .legend {
+      padding: 10px 0;
+      color: #97a7c8;
+      font-size: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 12px;
+    }
+
+    .modal {
+      width: min(580px, 100%);
+      background: #171b26;
+      border: 1px solid #333a4a;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .modal h3 { margin: 0 0 12px; }
+    .row { display: grid; gap: 8px; margin-bottom: 10px; }
+    .row.two { grid-template-columns: 1fr 1fr; }
+
+    input, select {
+      width: 100%;
+      background: #111521;
+      color: #eaf0ff;
+      border: 1px solid #31394c;
+      border-radius: 7px;
+      padding: 10px;
+    }
+
+    .modal-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid #3a4358;
+      background: #222a3a;
+      color: #e9efff;
+      border-radius: 8px;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn.primary { background: #2f6feb; border-color: #2f6feb; }
+    .btn.danger { background: #a12638; border-color: #a12638; }
+
+    @media (max-width: 900px) {
+      .title { font-size: 24px; }
+      .dow div { font-size: 24px; }
+      .date-num { font-size: 24px; }
+      .cell { min-height: 140px; }
+      .event { font-size: 12px; }
+      .event-time { display: none; }
+      .actions .today { font-size: 24px; }
+    }
+  </style>
 </head>
 <body>
-<main class="app"><header class="top"><h1 id="title"></h1><div class="tabs"><span>Day 日</span><span>Week 週</span><span class="on">Month 月</span></div><div class="actions"><button class="icon" id="prev">‹</button><button class="text" id="today">Today 今天</button><button class="icon" id="next">›</button><button class="primary" id="add">＋ Add 新增</button></div></header><section class="bar"><p class="hint">Click a day to add an event. Click an event to edit it. / 按日期新增活動，按活動可更改內容。</p><div><button class="secondary" id="export">Export 匯出</button> <button class="secondary" id="import">Import 匯入</button> <button class="secondary" id="reset">Reset 重設</button></div></section><section class="calendar" id="cal"></section></main>
-<section class="modal" id="modal"><div class="dialog"><div class="dh"><h2 id="modalTitle">Add Event 新增活動</h2><button class="icon" id="close">×</button></div><form id="form"><input id="id" type="hidden"><div class="fields"><div class="field"><label>Chinese Title 中文活動名稱</label><input id="zh" required placeholder="例如：跆拳道"></div><div class="field"><label>English Title 英文活動名稱</label><input id="en" required placeholder="e.g. Taekwondo"></div><div class="field"><label>Start 開始時間</label><input id="start" type="datetime-local" required></div><div class="field"><label>End 完結時間</label><input id="end" type="datetime-local" required></div><div class="field"><label>Color 顏色</label><select id="color"><option value="blue">Blue 藍色</option><option value="green">Green 綠色</option><option value="yellow">Yellow 黃色</option><option value="purple">Purple 紫色</option><option value="pink">Pink 粉紅色</option><option value="orange">Orange 橙色</option></select></div><div class="field"><label>Icon 圖示</label><input id="icon" placeholder="例如：🥋"></div><div class="field full"><label>Notes 備註</label><textarea id="notes" placeholder="Optional notes / 可留空"></textarea></div></div></form><div class="df"><button class="secondary danger" id="del">Delete 刪除</button><div class="right"><button class="secondary" id="cancel">Cancel 取消</button><button class="primary" form="form">Save 儲存</button></div></div></div></section><div class="toast" id="toast"></div>
-<script>
-const KEY="kelvin-schedule-events-v3",C={blue:"var(--blue)",green:"var(--green)",yellow:"var(--yellow)",purple:"var(--purple)",pink:"var(--pink)",orange:"var(--orange)"},W=["Sun 週日","Mon 週一","Tue 週二","Wed 週三","Thu 週四","Fri 週五","Sat 週六"],M=["January 1月","February 2月","March 3月","April 4月","May 5月","June 6月","July 7月","August 8月","September 9月","October 10月","November 11月","December 12月"];let month=new Date(2026,4,1),events=load();const $=s=>document.querySelector(s),cal=$("#cal"),f={id:$("#id"),zh:$("#zh"),en:$("#en"),start:$("#start"),end:$("#end"),color:$("#color"),icon:$("#icon"),notes:$("#notes")};function uid(){return crypto.randomUUID?crypto.randomUUID():"e"+Date.now()+Math.random()}function ev(d,s,e,zh,en,color,icon=""){return{id:uid(),titleZh:zh,titleEn:en,startAt:`2026-05-${String(d).padStart(2,"0")}T${s}`,endAt:`2026-05-${String(d).padStart(2,"0")}T${e}`,color,icon,notes:""}}function seed(){let a=[ev(11,"10:00","11:00","跆拳道","Taekwondo","blue","🥋"),ev(11,"12:55","13:10","Boxhill-Ambassador","Boxhill-Ambassador","green","🎒"),ev(11,"13:15","14:15","Boxhill","Boxhill","green","🎒"),ev(11,"20:10","21:10","網上數學","Online Maths","yellow","📐"),ev(12,"10:55","11:55","GAPSK 考試","GAPSK Exam","green","📝"),ev(12,"12:40","13:40","Boxhill","Boxhill","green","🎒"),ev(12,"17:00","18:00","小王子藝術","Little Prince Art","pink","🎨"),ev(13,"09:30","10:30","科學實驗室","Monster Lab","purple","🧪"),ev(13,"13:15","14:15","Boxhill","Boxhill","green","🎒"),ev(13,"17:00","18:00","思維訓練","Mind power","orange","📝"),ev(14,"12:40","13:40","Boxhill","Boxhill","green","🎒"),ev(14,"20:10","21:10","網上數學","Online Maths","yellow","📐"),ev(15,"09:30","10:30","科學實驗室","Monster Lab","purple","🧪"),ev(15,"13:15","14:15","Boxhill","Boxhill","green","🎒"),ev(16,"09:00","10:00","鋼琴","Piano","green","🎹"),ev(16,"16:00","17:00","科學實驗室","Monster lab","purple","👨🏻‍🔬"),ev(18,"10:00","11:00","跆拳道","Taekwondo","blue","🥋"),ev(18,"13:15","14:15","Boxhill","Boxhill","green","🎒"),ev(18,"20:10","21:10","網上數學","Online Maths","yellow","📐"),ev(19,"12:40","13:40","Boxhill","Boxhill","green","🎒"),ev(19,"17:00","18:00","小王子藝術","Little Prince Art","pink","🎨"),ev(26,"12:40","13:40","Boxhill","Boxhill","green","🎒"),ev(26,"17:00","18:00","小王子藝術","Little Prince Art","pink","🎨"),ev(27,"09:30","10:30","科學實驗室","Monster Lab","purple","🧪"),ev(27,"13:15","14:15","Boxhill 生日派對","Boxhill B-day party","green","🥳 🎒"),ev(27,"17:00","18:00","思維訓練","Mind power","orange","📝"),ev(28,"20:10","21:10","網上數學","Online Maths","yellow","📐"),ev(29,"09:30","10:30","科學實驗室","Monster Lab","purple","🧪"),ev(29,"17:30","18:30","思維訓練","Mind power","orange","📝"),ev(30,"09:00","10:00","鋼琴","Piano","green","🎹"),ev(30,"10:20","11:20","面試班","Interview class","yellow","📚")];[["2026-06-01T10:00","2026-06-01T11:00","跆拳道","Taekwondo","blue","🥋"],["2026-06-01T13:15","2026-06-01T14:15","Boxhill","Boxhill","green","🎒"],["2026-06-01T20:10","2026-06-01T21:10","網上數學","Online Maths","yellow","📐"],["2026-06-02T12:15","2026-06-02T13:15","Boxhill 彩排","Boxhill Rehearsal","green","⭐ 🎁"],["2026-06-03T09:30","2026-06-03T10:30","科學實驗室","Monster Lab","purple","🧪"],["2026-06-03T13:15","2026-06-03T14:15","Boxhill","Boxhill","green","🎒"],["2026-06-03T17:00","2026-06-03T18:00","思維訓練","Mind power","orange","📝"],["2026-06-04T12:40","2026-06-04T13:40","Boxhill","Boxhill","green","🎒"],["2026-06-04T20:10","2026-06-04T21:10","網上數學","Online Maths","yellow","📐"],["2026-06-05T09:30","2026-06-05T10:30","科學實驗室","Monster Lab","purple","🧪"],["2026-06-05T13:15","2026-06-05T14:15","Boxhill","Boxhill","green","🎒"],["2026-06-06T09:00","2026-06-06T10:00","鋼琴","Piano","green","🎹"],["2026-06-06T10:20","2026-06-06T11:20","面試班","Interview class","yellow","📚"]].forEach(x=>a.push({id:uid(),startAt:x[0],endAt:x[1],titleZh:x[2],titleEn:x[3],color:x[4],icon:x[5],notes:""}));return a}function load(){try{return JSON.parse(localStorage.getItem(KEY))||seed()}catch{return seed()}}function save(){localStorage.setItem(KEY,JSON.stringify(events))}function key(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}function dt(d,h=9,m=0){let x=new Date(d);x.setHours(h,m,0,0);return key(x)+"T"+String(x.getHours()).padStart(2,"0")+":"+String(x.getMinutes()).padStart(2,"0")}function time(e){let a=new Date(e.startAt),b=new Date(e.endAt),o={hour:"2-digit",minute:"2-digit"};return a.toLocaleTimeString("zh-HK",o)+"-"+b.toLocaleTimeString("zh-HK",o)}function msg(t){let x=$("#toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2200)}function render(){cal.innerHTML="";let y=month.getFullYear(),m=month.getMonth();$("#title").innerHTML=`${y} <b>${M[m]}</b>`;W.forEach(w=>{let h=document.createElement("div");h.className="weekday";h.textContent=w;cal.appendChild(h)});let first=new Date(y,m,1),start=new Date(first);start.setDate(first.getDate()-first.getDay());for(let i=0;i<42;i++){let d=new Date(start);d.setDate(start.getDate()+i);let k=key(d),list=events.filter(e=>e.startAt.slice(0,10)===k).sort((a,b)=>a.startAt.localeCompare(b.startAt)),now=new Date,cell=document.createElement("article");cell.className=["day",d.getMonth()!=m?"outside":"",[0,6].includes(d.getDay())?"weekend":"",key(now)===k?"today":"",list.length?"has":""].filter(Boolean).join(" ");cell.innerHTML=`<div class="dateRow"><span class="date">${d.getDate()}日</span><button class="addDay">+</button></div>`;cell.querySelector("button").onclick=()=>openNew(d);list.forEach(e=>{let b=document.createElement("button");b.className="event";b.innerHTML=`<i class="dot" style="background:${C[e.color]||C.blue}"></i><span class="eventTitle">${e.icon?e.icon+" ":""}${e.titleZh} / ${e.titleEn}</span><span class="eventTime">${time(e)}</span>`;b.onclick=()=>openEdit(e.id);cell.appendChild(b)});cal.appendChild(cell)}}function openNew(d=month){f.id.value="";f.zh.value="";f.en.value="";f.start.value=dt(d);f.end.value=dt(d,10);f.color.value="blue";f.icon.value="";f.notes.value="";$("#modalTitle").textContent="Add Event 新增活動";$("#del").style.visibility="hidden";$("#modal").classList.add("open");f.zh.focus()}function openEdit(id){let e=events.find(x=>x.id===id);if(!e)return;f.id.value=e.id;f.zh.value=e.titleZh;f.en.value=e.titleEn;f.start.value=e.startAt;f.end.value=e.endAt;f.color.value=e.color;f.icon.value=e.icon||"";f.notes.value=e.notes||"";$("#modalTitle").textContent="Edit Event 更改活動";$("#del").style.visibility="visible";$("#modal").classList.add("open")}function closeM(){$("#modal").classList.remove("open")}$("#form").onsubmit=e=>{e.preventDefault();if(f.end.value<=f.start.value)return msg("End time must be after start time / 完結時間必須遲過開始時間");let data={id:f.id.value||uid(),titleZh:f.zh.value.trim(),titleEn:f.en.value.trim(),startAt:f.start.value,endAt:f.end.value,color:f.color.value,icon:f.icon.value.trim(),notes:f.notes.value.trim()};events=f.id.value?events.map(x=>x.id===data.id?data:x):events.concat(data);save();render();closeM();msg("Saved / 已儲存")};$("#del").onclick=()=>{events=events.filter(x=>x.id!==f.id.value);save();render();closeM();msg("Deleted / 已刪除")};$("#close").onclick=$("#cancel").onclick=closeM;$("#add").onclick=()=>openNew(new Date(month));$("#prev").onclick=()=>{month=new Date(month.getFullYear(),month.getMonth()-1,1);render()};$("#next").onclick=()=>{month=new Date(month.getFullYear(),month.getMonth()+1,1);render()};$("#today").onclick=()=>{let n=new Date;month=new Date(n.getFullYear(),n.getMonth(),1);render()};$("#reset").onclick=()=>{events=seed();save();month=new Date(2026,4,1);render();msg("Reset / 已重設")};$("#export").onclick=async()=>{await navigator.clipboard.writeText(JSON.stringify(events,null,2));msg("Copied JSON / 已複製 JSON")};$("#import").onclick=()=>{let t=prompt("Paste exported JSON / 貼上已匯出的 JSON");if(!t)return;try{events=JSON.parse(t);save();render();msg("Imported / 已匯入")}catch{msg("Import failed / 匯入失敗")}};$("#modal").onclick=e=>{if(e.target.id==="modal")closeM()};render();
-</script>
+  <div class="wrap">
+    <div class="topbar">
+      <div id="title" class="title">2026年 5月</div>
+      <div class="center-tabs">
+        <button>日</button>
+        <button>週</button>
+        <button class="active">月</button>
+      </div>
+      <div class="actions">
+        <button id="prevBtn">‹</button>
+        <button id="todayBtn" class="today">今天</button>
+        <button id="nextBtn">›</button>
+        <button id="addBtn">+</button>
+      </div>
+    </div>
+
+    <div class="dow">
+      <div>週日</div><div>週一</div><div>週二</div><div>週三</div><div>週四</div><div class="friday">週五</div><div>週六</div>
+    </div>
+    <div id="grid" class="grid"></div>
+
+    <div class="legend">
+      <span><i class="dot" style="background:#44a2ff"></i>Taekwondo</span>
+      <span><i class="dot" style="background:#72d572"></i>Boxhill / Piano</span>
+      <span><i class="dot" style="background:#f4e65a"></i>Online Maths / Interview</span>
+      <span><i class="dot" style="background:#c680ff"></i>Monster Lab</span>
+      <span><i class="dot" style="background:#ff79c6"></i>Little Prince Art</span>
+      <span><i class="dot" style="background:#ffae7d"></i>Mind power</span>
+    </div>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <h3 id="modalTitle">新增行程</h3>
+      <div class="row two">
+        <div>
+          <label>日期</label>
+          <input id="eventDate" type="date" />
+        </div>
+        <div>
+          <label>時間</label>
+          <input id="eventTime" type="time" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>行程名稱</label>
+          <input id="eventName" type="text" placeholder="例如：Boxhill" />
+        </div>
+      </div>
+      <div class="row two">
+        <div>
+          <label>分類</label>
+          <input id="eventType" type="text" placeholder="例如：Boxhill" />
+        </div>
+        <div>
+          <label>顏色</label>
+          <select id="eventColor">
+            <option value="#44a2ff">藍</option>
+            <option value="#72d572">綠</option>
+            <option value="#f4e65a">黃</option>
+            <option value="#c680ff">紫</option>
+            <option value="#ff79c6">粉</option>
+            <option value="#ffae7d">橙</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="cancelBtn">取消</button>
+        <button class="btn danger" id="deleteBtn" style="display:none">刪除</button>
+        <button class="btn primary" id="saveBtn">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const storageKey = "calendar_2026_may_june";
+    const monthNames = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+    const initialEvents = [
+      { date: "2026-05-11", time: "10:00", name: "Taekwondo", type: "Taekwondo", color: "#44a2ff" },
+      { date: "2026-05-11", time: "13:15", name: "Boxhill", type: "Boxhill", color: "#72d572" },
+      { date: "2026-05-11", time: "20:10", name: "Online Maths", type: "Online Maths", color: "#f4e65a" },
+      { date: "2026-05-12", time: "10:55", name: "GAPSK Exam", type: "Exam", color: "#72d572" },
+      { date: "2026-05-12", time: "12:40", name: "Boxhill", type: "Boxhill", color: "#72d572" },
+      { date: "2026-05-12", time: "17:00", name: "Little Prince Art", type: "Art", color: "#ff79c6" },
+      { date: "2026-05-13", time: "09:30", name: "Monster Lab", type: "Monster Lab", color: "#c680ff" },
+      { date: "2026-05-13", time: "13:15", name: "Boxhill", type: "Boxhill", color: "#72d572" },
+      { date: "2026-05-13", time: "17:00", name: "Mind power", type: "Mind power", color: "#ffae7d" },
+      { date: "2026-05-30", time: "10:20", name: "Interview class", type: "Interview", color: "#f4e65a" },
+      { date: "2026-06-01", time: "10:00", name: "Taekwondo", type: "Taekwondo", color: "#44a2ff" },
+      { date: "2026-06-01", time: "13:15", name: "Boxhill", type: "Boxhill", color: "#72d572" },
+      { date: "2026-06-01", time: "20:10", name: "Online Maths", type: "Online Maths", color: "#f4e65a" },
+      { date: "2026-06-03", time: "09:30", name: "Monster Lab", type: "Monster Lab", color: "#c680ff" },
+      { date: "2026-06-03", time: "13:15", name: "Boxhill", type: "Boxhill", color: "#72d572" },
+      { date: "2026-06-03", time: "17:00", name: "Mind power", type: "Mind power", color: "#ffae7d" },
+      { date: "2026-06-06", time: "09:00", name: "Piano", type: "Piano", color: "#72d572" },
+      { date: "2026-06-06", time: "10:20", name: "Interview class", type: "Interview", color: "#f4e65a" }
+    ];
+
+    let events = loadEvents();
+    let current = new Date(2026, 4, 1);
+    let editingId = null;
+    let selectedDate = null;
+
+    function uid() { return Math.random().toString(36).slice(2, 10); }
+    function loadEvents() {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) return JSON.parse(raw);
+      const seeded = initialEvents.map(e => ({ id: uid(), ...e }));
+      localStorage.setItem(storageKey, JSON.stringify(seeded));
+      return seeded;
+    }
+    function saveEvents() { localStorage.setItem(storageKey, JSON.stringify(events)); }
+
+    function formatCNTime(t) {
+      if (!t) return "";
+      const [h, m] = t.split(":").map(Number);
+      const isPM = h >= 12;
+      const hh = h % 12 === 0 ? 12 : h % 12;
+      return `${isPM ? "下午" : "上午"}${hh}:${String(m).padStart(2, "0")}`;
+    }
+
+    function monthGrid(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = dateObj.getMonth();
+      const first = new Date(y, m, 1);
+      const start = new Date(first);
+      start.setDate(1 - first.getDay());
+      const arr = [];
+      for (let i = 0; i < 42; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        arr.push(d);
+      }
+      return arr;
+    }
+
+    function iso(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function render() {
+      document.getElementById("title").textContent = `${current.getFullYear()}年 ${monthNames[current.getMonth()]}`;
+      const grid = document.getElementById("grid");
+      grid.innerHTML = "";
+
+      const todayIso = iso(new Date());
+      for (const d of monthGrid(current)) {
+        const cell = document.createElement("div");
+        const dIso = iso(d);
+        cell.className = "cell";
+        if (d.getMonth() !== current.getMonth()) cell.classList.add("other-month");
+        if (dIso === todayIso) cell.classList.add("today-mark");
+
+        const num = document.createElement("div");
+        num.className = "date-num";
+        num.textContent = `${d.getDate()}日`;
+        cell.appendChild(num);
+
+        const dayEvents = events
+          .filter(e => e.date === dIso)
+          .sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+
+        for (const e of dayEvents) {
+          const row = document.createElement("div");
+          row.className = "event";
+          row.innerHTML = `
+            <i class="dot" style="background:${e.color || "#72d572"}"></i>
+            <span class="event-name">${e.name}</span>
+            <span class="event-time">${formatCNTime(e.time)}</span>
+          `;
+          row.addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            openModal(e.id);
+          });
+          cell.appendChild(row);
+        }
+
+        cell.addEventListener("click", () => {
+          selectedDate = dIso;
+          openModal();
+        });
+        grid.appendChild(cell);
+      }
+    }
+
+    function openModal(id = null) {
+      editingId = id;
+      const modal = document.getElementById("modalBackdrop");
+      const delBtn = document.getElementById("deleteBtn");
+      const title = document.getElementById("modalTitle");
+      const date = document.getElementById("eventDate");
+      const time = document.getElementById("eventTime");
+      const name = document.getElementById("eventName");
+      const type = document.getElementById("eventType");
+      const color = document.getElementById("eventColor");
+
+      if (id) {
+        const e = events.find(x => x.id === id);
+        title.textContent = "編輯行程";
+        date.value = e.date;
+        time.value = e.time || "";
+        name.value = e.name || "";
+        type.value = e.type || "";
+        color.value = e.color || "#72d572";
+        delBtn.style.display = "inline-block";
+      } else {
+        title.textContent = "新增行程";
+        date.value = selectedDate || iso(new Date(current.getFullYear(), current.getMonth(), 1));
+        time.value = "";
+        name.value = "";
+        type.value = "";
+        color.value = "#72d572";
+        delBtn.style.display = "none";
+      }
+
+      modal.style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("modalBackdrop").style.display = "none";
+      editingId = null;
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      const date = document.getElementById("eventDate").value;
+      const time = document.getElementById("eventTime").value;
+      const name = document.getElementById("eventName").value.trim();
+      const type = document.getElementById("eventType").value.trim();
+      const color = document.getElementById("eventColor").value;
+
+      if (!date || !name) {
+        alert("請至少輸入日期同名稱");
+        return;
+      }
+
+      if (editingId) {
+        events = events.map(e => e.id === editingId ? { ...e, date, time, name, type, color } : e);
+      } else {
+        events.push({ id: uid(), date, time, name, type, color });
+      }
+
+      saveEvents();
+      closeModal();
+      render();
+    });
+
+    document.getElementById("deleteBtn").addEventListener("click", () => {
+      if (!editingId) return;
+      events = events.filter(e => e.id !== editingId);
+      saveEvents();
+      closeModal();
+      render();
+    });
+
+    document.getElementById("cancelBtn").addEventListener("click", closeModal);
+    document.getElementById("modalBackdrop").addEventListener("click", (e) => {
+      if (e.target.id === "modalBackdrop") closeModal();
+    });
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      current = new Date(current.getFullYear(), current.getMonth() - 1, 1);
+      render();
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      current = new Date(current.getFullYear(), current.getMonth() + 1, 1);
+      render();
+    });
+
+    document.getElementById("todayBtn").addEventListener("click", () => {
+      const now = new Date();
+      current = new Date(now.getFullYear(), now.getMonth(), 1);
+      render();
+    });
+
+    document.getElementById("addBtn").addEventListener("click", () => {
+      selectedDate = iso(new Date(current.getFullYear(), current.getMonth(), 1));
+      openModal();
+    });
+
+    render();
+  </script>
 </body>
 </html>
