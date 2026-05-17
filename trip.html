@@ -140,6 +140,30 @@
       border-radius: 14px;
       border: 2px solid #f0decb;
     }
+    .cute-board {
+      margin-top: 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 8px 20px rgba(41, 30, 23, 0.06);
+    }
+    .cute-board h3 {
+      margin: 0 0 6px;
+      color: #7b3f32;
+      font-size: 1rem;
+    }
+    .cute-board p {
+      margin: 0 0 10px;
+      color: var(--soft);
+      font-size: 0.88rem;
+    }
+    .cute-board img {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+      border: 1px solid #f2ddd0;
+    }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 14px; }
     .day {
       background: var(--card);
@@ -203,6 +227,7 @@
         <div class="flight-row"><strong>UO871</strong> 回程 NRT → HKG</div>
         <div class="flight-row">出發 17:05（東京） · 到達 21:00（香港）</div>
         <div id="uo871Status" class="flight-row">狀態：待刷新</div>
+        <div id="flightLastUpdated" class="flight-sub">最後更新時間：未更新</div>
         <div id="flightMeta" class="flight-sub">來源：HKIA 官方資料（最近可用紀錄）</div>
       </aside>
     </div>
@@ -212,16 +237,21 @@
       <h2 id="overviewTitle">6日總地圖（全部景點 + 路線）</h2>
       <p class="legend">每一日用獨立顏色畫路線，箭嘴表示方向，marker 可點擊。</p>
       <div id="overviewMap" aria-label="6日景點總地圖"></div>
+      <div class="cute-board" aria-label="可愛版行程圖">
+        <h3>Q 版行程圖</h3>
+        <p>完整可愛版總表，方便快速對照每日路線。</p>
+        <img src="cute-itinerary.png" alt="日本關東6日行程可愛版總表" loading="lazy" />
+      </div>
     </section>
 
     <section class="grid" id="itinerary"></section>
   </main>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script>
-    const placeCoords = {"成田機場":[35.7730,140.3929],"輕井澤站":[36.3427,138.6390],"ANA Holiday Inn Resort Karuizawa":[36.3955,138.5850],"輕井澤":[36.3486,138.5969],"草津溫泉湯畑":[36.6230,138.5969],"Kusatsu Onsen Yubatake Sensui":[36.6224,138.5964],"草津溫泉":[36.6200,138.5960],"輕井澤王子購物廣場":[36.3422,138.6340],"輕井澤住宿":[36.3450,138.6370],"川越一番街":[35.9237,139.4855],"川越東武酒店":[35.9066,139.4825],"川越":[35.9251,139.4856],"淺草":[35.7148,139.7967],"東京灣拉維斯塔酒店":[35.6556,139.7926],"東京灣":[35.6050,139.7700],"上野":[35.7138,139.7772],"銀座":[35.6717,139.7650]};
-    const placeIntro = {"成田機場":"東京主要國際機場，交通銜接完整，適合作為行程起終點。","輕井澤站":"輕井澤核心交通站，可轉乘巴士前往度假區與周邊景點。","ANA Holiday Inn Resort Karuizawa":"山景度假型酒店，環境較寧靜，適合放鬆休息。","輕井澤":"知名高原避暑地，街區散步與自然景觀都很受歡迎。","草津溫泉湯畑":"草津地標溫泉源頭，夜間點燈後氣氛特別好。","Kusatsu Onsen Yubatake Sensui":"靠近湯畑的住宿點，步行可到主要溫泉區。","草津溫泉":"日本代表性溫泉鄉，可體驗外湯與溫泉街。","輕井澤王子購物廣場":"大型 outlet 商場，品牌多且鄰近車站。","輕井澤住宿":"回到輕井澤區域住宿，方便隔日移動。","川越一番街":"保留江戶風格老街，適合拍照與邊走邊吃。","川越東武酒店":"位於川越市區，步行逛街與交通都方便。","川越":"東京近郊人氣小旅行地點，有「小江戶」氛圍。","淺草":"東京經典觀光區，雷門與仲見世商店街很集中。","東京灣拉維斯塔酒店":"東京灣沿岸住宿點，夜景與海景視野佳。","東京灣":"臨海區域，周邊景點多，交通方式也很多元。","上野":"博物館、公園、阿美橫町集中，適合白天逛街散步。","銀座":"東京高級購物與美食區，街景整齊且餐廳選擇多。"};
+    const placeCoords = {"成田機場":[35.7730,140.3929],"輕井澤站":[36.3427,138.6390],"ANA Holiday Inn Resort Karuizawa":[36.3955,138.5850],"輕井澤":[36.3486,138.5969],"草津溫泉湯畑":[36.6230,138.5969],"Kusatsu Onsen Yubatake Sensui":[36.6224,138.5964],"草津溫泉":[36.6200,138.5960],"輕井澤王子購物廣場":[36.3422,138.6340],"川越一番街":[35.9237,139.4855],"川越東武酒店":[35.9066,139.4825],"皇家帕恩斯酒店浦和":[35.8586,139.6575],"川越":[35.9251,139.4856],"淺草":[35.7148,139.7967],"東京灣拉維斯塔酒店":[35.6556,139.7926],"東京灣":[35.6050,139.7700],"上野":[35.7138,139.7772],"銀座":[35.6717,139.7650]};
+    const placeIntro = {"成田機場":"東京主要國際機場，交通銜接完整，適合作為行程起終點。","輕井澤站":"輕井澤核心交通站，可轉乘巴士前往度假區與周邊景點。","ANA Holiday Inn Resort Karuizawa":"山景度假型酒店，環境較寧靜，適合放鬆休息。","輕井澤":"知名高原避暑地，街區散步與自然景觀都很受歡迎。","草津溫泉湯畑":"草津地標溫泉源頭，夜間點燈後氣氛特別好。","Kusatsu Onsen Yubatake Sensui":"靠近湯畑的住宿點，步行可到主要溫泉區。","草津溫泉":"日本代表性溫泉鄉，可體驗外湯與溫泉街。","輕井澤王子購物廣場":"大型 outlet 商場，品牌多且鄰近車站。","川越一番街":"保留江戶風格老街，適合拍照與邊走邊吃。","川越東武酒店":"位於川越市區，步行逛街與交通都方便。","皇家帕恩斯酒店浦和":"浦和地區商務酒店，前往埼玉與東京市區都方便。","川越":"東京近郊人氣小旅行地點，有「小江戶」氛圍。","淺草":"東京經典觀光區，雷門與仲見世商店街很集中。","東京灣拉維斯塔酒店":"東京灣沿岸住宿點，夜景與海景視野佳。","東京灣":"臨海區域，周邊景點多，交通方式也很多元。","上野":"博物館、公園、阿美橫町集中，適合白天逛街散步。","銀座":"東京高級購物與美食區，街景整齊且餐廳選擇多。"};
     const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899"];
-    const days=[{title:"Day 1 · 20-21/5",dateLabel:"20-21/5",stay:"住輕井澤 · ANA Holiday Inn Resort Karuizawa",route:["成田機場","輕井澤站","ANA Holiday Inn Resort Karuizawa"],hotelUrl:"https://www.ihg.com/holidayinnresorts/hotels/us/en/karuizawa"},{title:"Day 2 · 21-22/5",dateLabel:"21-22/5",stay:"住草津溫泉 · Kusatsu Onsen Yubatake Sensui",route:["輕井澤","草津溫泉湯畑","Kusatsu Onsen Yubatake Sensui"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=121167983&checkIn=2026-05-21&checkOut=2026-05-22&locale=zh-HK"},{title:"Day 3 · 22-23/5",dateLabel:"22-23/5",stay:"住輕井澤",route:["草津溫泉","輕井澤王子購物廣場","輕井澤住宿"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=125759448&checkIn=2026-05-22&checkOut=2026-05-23&locale=zh-HK"},{title:"Day 4 · 23-24/5",dateLabel:"23-24/5",stay:"住川越 · 川越東武酒店",route:["輕井澤","川越一番街","川越東武酒店"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=1550212&checkIn=2026-05-23&checkOut=2026-05-24&locale=zh-HK"},{title:"Day 5 · 24-25/5",dateLabel:"24-25/5",stay:"住東京 · 東京灣拉維斯塔酒店",route:["川越","淺草","東京灣拉維斯塔酒店"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=83067673&checkIn=2026-05-24&checkOut=2026-05-25&locale=zh-HK"},{title:"Day 6 · 25/5",dateLabel:"25/5",stay:"東京市區自由行 + 回程",route:["東京灣","上野","銀座","成田機場"],hotelUrl:"https://www.google.com/maps/search/%E6%88%90%E7%94%B0%E6%A9%9F%E5%A0%B4"}];
+    const days=[{title:"Day 1 · 20-21/5",dateLabel:"20-21/5",stay:"住輕井澤 · ANA輕井澤假日酒店（ANA Holiday Inn Resort Karuizawa）",route:["成田機場","輕井澤站","ANA Holiday Inn Resort Karuizawa"],hotelUrl:"https://www.ihg.com/holidayinnresorts/hotels/us/en/karuizawa"},{title:"Day 2 · 21-22/5",dateLabel:"21-22/5",stay:"住草津溫泉 · Kusatsu Onsen Yubatake Sensui",route:["輕井澤","草津溫泉湯畑","Kusatsu Onsen Yubatake Sensui"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=121167983&checkIn=2026-05-21&checkOut=2026-05-22&locale=zh-HK"},{title:"Day 3 · 22-23/5",dateLabel:"22-23/5",stay:"住輕井澤 · ANA輕井澤假日酒店（ANA Holiday Inn Resort Karuizawa）",route:["草津溫泉","輕井澤王子購物廣場","ANA Holiday Inn Resort Karuizawa"],hotelUrl:"https://www.ihg.com/holidayinnresorts/hotels/us/en/karuizawa"},{title:"Day 4 · 23-24/5",dateLabel:"23-24/5",stay:"住浦和 · 皇家帕恩斯酒店浦和",route:["輕井澤","川越一番街","皇家帕恩斯酒店浦和"],hotelUrl:"https://www.google.com/maps/search/%E7%9A%87%E5%AE%B6%E5%B8%95%E6%81%A9%E6%96%AF%E9%85%92%E5%BA%97%E6%B5%A6%E5%92%8C"},{title:"Day 5 · 24-25/5",dateLabel:"24-25/5",stay:"住東京 · 東京灣拉維斯塔酒店",route:["川越","淺草","東京灣拉維斯塔酒店"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=83067673&checkIn=2026-05-24&checkOut=2026-05-25&locale=zh-HK"},{title:"Day 6 · 25/5",dateLabel:"25/5",stay:"東京市區自由行 + 回程",route:["東京灣","上野","銀座","成田機場"],hotelUrl:"https://www.google.com/maps/search/%E6%88%90%E7%94%B0%E6%A9%9F%E5%A0%B4"}];
     const dirUrl=(route)=>`https://www.google.com/maps/dir/${route.map(encodeURIComponent).join("/")}`;
     const embedUrl=(route)=>`https://maps.google.com/maps?q=${encodeURIComponent(route.join(" -> "))}&output=embed`;
     const filterEl=document.getElementById("dateFilter"),root=document.getElementById("itinerary"),overviewTitle=document.getElementById("overviewTitle");
@@ -229,6 +259,7 @@
     const uo848StatusEl=document.getElementById("uo848Status");
     const uo871StatusEl=document.getElementById("uo871Status");
     const flightMetaEl=document.getElementById("flightMeta");
+    const flightLastUpdatedEl=document.getElementById("flightLastUpdated");
     filterEl.innerHTML=[{value:"all",label:"全部日期"},...days.map((d,i)=>({value:String(i),label:d.dateLabel}))].map(o=>`<option value="${o.value}">${o.label}</option>`).join("");
     const map=L.map("overviewMap"); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"&copy; OpenStreetMap"}).addTo(map);
     let markers=[],polylines=[];
@@ -284,8 +315,11 @@
         uo848StatusEl.textContent = depHit ? `狀態：${depHit.status || "N/A"}` : "狀態：未找到最新紀錄";
         uo871StatusEl.textContent = arrHit ? `狀態：${arrHit.status || "N/A"}` : "狀態：未找到最新紀錄";
         const stamp = new Date().toLocaleString("zh-HK", { hour12: false });
-        flightMetaEl.textContent = `已更新：${stamp}（HKIA 官方資料）`;
+        flightLastUpdatedEl.textContent = `最後更新時間：${stamp}`;
+        flightMetaEl.textContent = "來源：HKIA 官方資料（最近可用紀錄）";
       } catch (e) {
+        const stamp = new Date().toLocaleString("zh-HK", { hour12: false });
+        flightLastUpdatedEl.textContent = `最後更新時間：${stamp}（更新失敗）`;
         flightMetaEl.textContent = "更新失敗：可稍後重試，或以航空公司官方頁面為準。";
       } finally {
         refreshBtn.disabled = false;
