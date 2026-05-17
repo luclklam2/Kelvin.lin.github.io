@@ -5,15 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TRIP 6日行程</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f4f0e8;
-      --ink: #1f1b18;
-      --soft: #5e5550;
-      --brand: #e0562a;
-      --brand2: #1f7a7a;
-      --card: #fffaf3;
-      --line: #e8d9c6;
+      --bg: #fff6ef;
+      --ink: #322219;
+      --soft: #776256;
+      --brand: #eb5a2f;
+      --brand2: #178f8f;
+      --card: #fffdf9;
+      --line: #efd9c4;
+      --rose: #ffd9d2;
     }
     * { box-sizing: border-box; }
     body {
@@ -21,33 +25,35 @@
       font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at 90% 0%, rgba(224, 86, 42, 0.18), transparent 36%),
-        radial-gradient(circle at 5% 20%, rgba(31, 122, 122, 0.16), transparent 30%),
+        radial-gradient(circle at 90% 0%, rgba(235, 90, 47, 0.22), transparent 34%),
+        radial-gradient(circle at 10% 20%, rgba(23, 143, 143, 0.17), transparent 30%),
+        radial-gradient(circle at 80% 70%, rgba(255, 173, 153, 0.2), transparent 35%),
         var(--bg);
     }
-    .wrap { max-width: 1160px; margin: 0 auto; padding: 28px 16px 56px; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 30px 18px 60px; }
     h1 {
       margin: 0;
-      font-size: 3.1rem;
-      letter-spacing: 0.5px;
-      font-family: "Times New Roman", "Noto Serif TC", serif;
-      text-shadow: 0 2px 0 #fff;
+      font-size: 3.2rem;
+      letter-spacing: 1px;
+      font-family: "Klee One", "Noto Sans TC", sans-serif;
+      line-height: 1.05;
+      text-shadow: 0 3px 0 #fff;
     }
-    .sub { margin: 8px 0 0; color: var(--soft); font-size: 1.02rem; }
+    .sub { margin: 10px 0 0; color: var(--soft); font-size: 1rem; font-weight: 500; }
     .topline {
       display: flex;
       justify-content: space-between;
       align-items: stretch;
-      gap: 14px;
-      margin-bottom: 14px;
+      gap: 16px;
+      margin-bottom: 16px;
     }
     .title-box {
       flex: 1;
-      border-radius: 20px;
+      border-radius: 24px;
       border: 1px solid var(--line);
-      padding: 18px 18px 16px;
-      background: linear-gradient(135deg, #fff6eb, #fffaf4 72%);
-      box-shadow: 0 10px 26px rgba(76, 52, 34, 0.09);
+      padding: 20px 20px 18px;
+      background: linear-gradient(135deg, #fff2e9, #fffaf6 72%);
+      box-shadow: 0 14px 30px rgba(76, 52, 34, 0.11);
       position: relative;
       overflow: hidden;
     }
@@ -59,15 +65,26 @@
       right: -40px;
       top: -80px;
       border-radius: 50%;
-      background: rgba(224, 86, 42, 0.12);
+      background: rgba(235, 90, 47, 0.17);
+    }
+    .trip-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; position: relative; z-index: 2; }
+    .trip-badge {
+      border: 1px solid #f2ccb8;
+      background: #fff8f2;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      color: #8f4c33;
+      font-weight: 700;
+      letter-spacing: 0.2px;
     }
     .flight-box {
       min-width: 320px;
-      background: linear-gradient(145deg, #fff, #fff8ed);
+      background: linear-gradient(155deg, #fffefb, #fff5e8);
       border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 14px 14px 12px;
-      box-shadow: 0 10px 24px rgba(45, 30, 19, 0.1);
+      border-radius: 24px;
+      padding: 15px 15px 13px;
+      box-shadow: 0 12px 26px rgba(45, 30, 19, 0.12);
     }
     .flight-box h3 {
       margin: 0 0 8px;
@@ -82,16 +99,16 @@
       gap: 8px;
     }
     .refresh-btn {
-      border: 1px solid #dfcbb3;
-      background: #fff;
-      color: #6a3a2a;
-      border-radius: 10px;
+      border: 1px solid #efc7ad;
+      background: linear-gradient(135deg, #fff, #ffe9db);
+      color: #7b3920;
+      border-radius: 12px;
       font-weight: 700;
       font-size: 0.78rem;
-      padding: 6px 10px;
+      padding: 7px 11px;
       cursor: pointer;
     }
-    .refresh-btn:hover { background: #fff7ee; }
+    .refresh-btn:hover { filter: brightness(0.98); }
     .flight-row { font-size: 0.9rem; margin: 4px 0; }
     .flight-sub { font-size: 0.78rem; color: var(--soft); margin-top: 6px; }
     .flight-link {
@@ -102,18 +119,19 @@
     @media (max-width: 900px) {
       .topline { flex-direction: column; }
       .flight-box { min-width: 0; width: 100%; }
-      h1 { font-size: 2.45rem; }
+      h1 { font-size: 2.55rem; }
     }
     .toolbar {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin: 4px 0 14px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: #fff;
+      margin: 5px 0 16px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.88);
       border: 1px solid var(--line);
-      box-shadow: 0 6px 16px rgba(41, 30, 23, 0.06);
+      box-shadow: 0 8px 18px rgba(41, 30, 23, 0.08);
+      backdrop-filter: blur(8px);
     }
     .toolbar label { font-weight: 700; color: #693d2f; }
     .toolbar select {
@@ -127,10 +145,10 @@
     .overview {
       background: linear-gradient(180deg, #fffaf4, #fffefb);
       border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 14px;
+      border-radius: 24px;
+      padding: 16px;
       margin: 0 0 14px;
-      box-shadow: 0 10px 24px rgba(41, 30, 23, 0.08);
+      box-shadow: 0 14px 28px rgba(41, 30, 23, 0.1);
     }
     .overview h2 {
       margin: 0 0 8px;
@@ -142,16 +160,17 @@
     #overviewMap {
       width: 100%;
       height: 420px;
-      border-radius: 14px;
-      border: 2px solid #f0decb;
+      border-radius: 16px;
+      border: 2px solid #f2dcc7;
+      box-shadow: inset 0 0 0 1px #fff;
     }
     .cute-board {
       margin-top: 14px;
       background: #fff;
       border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 12px;
-      box-shadow: 0 8px 20px rgba(41, 30, 23, 0.06);
+      border-radius: 18px;
+      padding: 13px;
+      box-shadow: 0 10px 22px rgba(41, 30, 23, 0.07);
     }
     .cute-board h3 {
       margin: 0 0 6px;
@@ -166,33 +185,33 @@
     .cute-board img {
       width: 100%;
       display: block;
-      border-radius: 12px;
-      border: 1px solid #f2ddd0;
+      border-radius: 14px;
+      border: 2px solid #ffe3d6;
     }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 16px; }
     .day {
       background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 18px;
+      border: 1px solid #efdccb;
+      border-radius: 22px;
       overflow: hidden;
-      box-shadow: 0 10px 24px rgba(31, 20, 13, 0.08);
+      box-shadow: 0 12px 26px rgba(31, 20, 13, 0.1);
     }
     .head {
-      padding: 14px 14px 10px;
-      border-bottom: 1px solid var(--line);
-      background: linear-gradient(130deg, #fff1de, #fffaf2 60%);
+      padding: 15px 15px 11px;
+      border-bottom: 1px solid #efddcc;
+      background: linear-gradient(130deg, #ffe5d5, #fff8f2 65%);
     }
     .day h3 { margin: 0; font-size: 1.2rem; color: #5e2f1f; }
     .meta { margin: 4px 0 0; color: #74655a; font-size: 0.9rem; }
-    .body { padding: 14px; }
+    .body { padding: 15px; }
     .spot-list { margin: 0 0 12px; padding-left: 18px; }
     .spot-list li { margin-bottom: 10px; }
     .spot-note { color: var(--soft); font-size: 0.88rem; line-height: 1.38; margin-top: 3px; }
     .map {
       width: 100%;
       height: 220px;
-      border: 2px solid #efddca;
-      border-radius: 12px;
+      border: 2px solid #efd8c3;
+      border-radius: 14px;
       margin-top: 8px;
       background: #eef2f5;
     }
@@ -200,24 +219,31 @@
     .btn {
       text-decoration: none;
       padding: 8px 12px;
-      border-radius: 10px;
+      border-radius: 11px;
       font-size: 0.85rem;
-      border: 1px solid #e3ccb0;
+      border: 1px solid #eacfb7;
       color: var(--ink);
-      background: #fff;
+      background: #fffdfb;
       font-weight: 600;
     }
     .btn.primary {
-      background: linear-gradient(135deg, var(--brand), #d64516);
+      background: linear-gradient(135deg, var(--brand), #d5481b);
       color: #fff;
       border-color: #cc4317;
     }
+    .btn:hover { transform: translateY(-1px); transition: 0.2s ease; }
   </style>
 </head>
 <body>
     <main class="wrap">
     <div class="topline">
-      <div>
+      <div class="title-box">
+        <div class="trip-badges">
+          <span class="trip-badge">TOKYO</span>
+          <span class="trip-badge">KARUIZAWA</span>
+          <span class="trip-badge">KUSATSU</span>
+          <span class="trip-badge">KAWAGOE</span>
+        </div>
         <h1>日本 6 日行程</h1>
         <p class="sub">根據你提供的 TRIP 試算表整理，含每日動線與地圖路線。</p>
       </div>
