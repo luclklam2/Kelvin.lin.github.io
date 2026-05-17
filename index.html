@@ -65,11 +65,22 @@ function openZoom(){document.querySelector('.modal').classList.add('open')}funct
   `;
   document.head.appendChild(style);
 
-  let fontScale=1;
   let activeStory=null;
+  let story1Audio=null;
+
+  function getStory1Audio(){
+    if(!story1Audio){
+      story1Audio=new Audio('Audio 1.mp4');
+      story1Audio.onended=()=>{activeStory=null;syncStoryButtons();};
+    }
+    return story1Audio;
+  }
+
+  function stopStory1Audio(){
+    if(story1Audio){story1Audio.pause();story1Audio.currentTime=0;}
+  }
 
   function applyFontScale(v){
-    fontScale=v;
     document.documentElement.style.setProperty('--reader-scale',String(v));
     document.querySelectorAll('.fontbtn').forEach(b=>b.classList.remove('active'));
     const id=v===0.9?'fontSm':(v===1?'fontMd':'fontLg');
@@ -93,30 +104,21 @@ function openZoom(){document.querySelector('.modal').classList.add('open')}funct
     document.querySelectorAll('#grid article.card button.btn').forEach((btn,idx)=>{
       const n=idx+1;
       btn.id='storyBtn'+n;
-      btn.dataset.story=String(n);
-      if(activeStory===n && speechSynthesis.speaking){
-        btn.textContent=speechSynthesis.paused?'▶️ 繼續':'⏸️ 暫停';
+      if(activeStory===n){
+        if(n===1 && story1Audio){
+          btn.textContent=story1Audio.paused?'▶️ 繼續':'⏸️ 暫停';
+        }else if(speechSynthesis.speaking){
+          btn.textContent=speechSynthesis.paused?'▶️ 繼續':'⏸️ 暫停';
+        }else{
+          btn.textContent=lang==='zh'?'🎙️ 廣東話跟讀':'🎙️ Read Aloud';
+        }
       }else{
         btn.textContent=lang==='zh'?'🎙️ 廣東話跟讀':'🎙️ Read Aloud';
       }
     });
   }
 
-  const _render=render;
-  render=function(){ _render(); syncStoryButtons(); installFontControls(); };
-
-  playStory=function(n){
-    const p=document.getElementById('s'+n);
-    if(!p) return;
-
-    if(activeStory===n && speechSynthesis.speaking){
-      if(speechSynthesis.paused) speechSynthesis.resume(); else speechSynthesis.pause();
-      syncStoryButtons();
-      return;
-    }
-
-    speechSynthesis.cancel();
-    activeStory=n;
+  function playStoryTTS(n,p){
     const text=p.dataset.text||p.innerText;
     const u=new SpeechSynthesisUtterance(text);
     u.lang=lang==='zh'?'zh-HK':'en-US';
@@ -127,13 +129,60 @@ function openZoom(){document.querySelector('.modal').classList.add('open')}funct
       const i=Math.min(chars.length-1,e.charIndex);
       if(chars[i]) chars[i].classList.add('active');
     };
-    u.onend=()=>{ activeStory=null; syncStoryButtons(); };
+    u.onend=()=>{activeStory=null;syncStoryButtons();};
     speechSynthesis.speak(u);
+  }
+
+  const _render=render;
+  render=function(){ _render(); syncStoryButtons(); installFontControls(); };
+
+  const _setLang=setLang;
+  setLang=function(l){
+    stopStory1Audio();
+    activeStory=null;
+    _setLang(l);
+    syncStoryButtons();
+  };
+
+  playStory=function(n){
+    const p=document.getElementById('s'+n);
+    if(!p) return;
+
+    if(n===1){
+      const a=getStory1Audio();
+      if(activeStory===1 && (a.currentTime>0 && !a.ended)){
+        if(a.paused) a.play(); else a.pause();
+        syncStoryButtons();
+        return;
+      }
+      speechSynthesis.cancel();
+      stopStory1Audio();
+      activeStory=1;
+      a.play().catch(()=>{playStoryTTS(1,p);});
+      syncStoryButtons();
+      return;
+    }
+
+    if(activeStory===n && speechSynthesis.speaking){
+      if(speechSynthesis.paused) speechSynthesis.resume(); else speechSynthesis.pause();
+      syncStoryButtons();
+      return;
+    }
+
+    stopStory1Audio();
+    speechSynthesis.cancel();
+    activeStory=n;
+    playStoryTTS(n,p);
     syncStoryButtons();
   };
 
   const _playAll=playAll;
-  playAll=function(){ activeStory=null; _playAll(); syncStoryButtons(); };
+  playAll=function(){
+    stopStory1Audio();
+    activeStory=null;
+    _playAll();
+    syncStoryButtons();
+  };
 
   syncStoryButtons();
   installFontControls();
