@@ -19,14 +19,18 @@
     .overview h2 { margin:0 0 8px; font-size:1.05rem; }
     .legend { margin:0 0 8px; color:var(--soft); font-size:.9rem; }
     #overviewMap { width:100%; height:380px; border-radius:10px; }
+    .q-map { width:100%; height:260px; border:0; border-radius:10px; margin-top:6px; }
+    .cute-wrap { background: linear-gradient(135deg, #fff7fb, #fffdf5); }
+    .q-map.cute { border:4px solid #f9a8d4; border-radius:22px; box-shadow:0 10px 26px rgba(236,72,153,.18); filter:saturate(1.08) contrast(1.02); }
     .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:14px; }
     .day { background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 8px 24px rgba(10,40,40,.08); }
     .head { padding:14px 14px 10px; border-bottom:1px solid var(--line); background:linear-gradient(135deg,#ecfeff,#f8fafc 70%); }
     .day h3 { margin:0; font-size:1.1rem; }
     .meta { margin:4px 0 0; color:var(--soft); font-size:.9rem; }
     .body { padding:14px; }
-    ol { margin:0 0 12px; padding-left:18px; }
-    li { margin-bottom:6px; }
+    .spot-list { margin:0 0 12px; padding-left:18px; }
+    .spot-list li { margin-bottom:10px; }
+    .spot-note { color:var(--soft); font-size:.88rem; line-height:1.35; margin-top:3px; }
     .map { width:100%; height:220px; border:0; border-radius:10px; margin-top:8px; background:#eef2f5; }
     .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
     .btn { text-decoration:none; padding:8px 10px; border-radius:8px; font-size:.86rem; border:1px solid var(--line); color:var(--ink); background:#fff; }
@@ -37,122 +41,44 @@
   <main class="wrap">
     <h1>日本 6 日行程</h1>
     <p class="sub">根據你提供的 TRIP 試算表整理，含每日動線與地圖路線。</p>
-    <div class="toolbar">
-      <label for="dateFilter">日期 Filter：</label>
-      <select id="dateFilter"></select>
-    </div>
+    <div class="toolbar"><label for="dateFilter">日期 Filter：</label><select id="dateFilter"></select></div>
+
     <section class="overview">
       <h2 id="overviewTitle">6日總地圖（全部景點 + 路線）</h2>
       <p class="legend">每一日用獨立顏色畫路線，箭嘴表示方向，marker 可點擊。</p>
       <div id="overviewMap" aria-label="6日景點總地圖"></div>
     </section>
+
+    <section class="overview cute-wrap">
+      <h2 id="qMapTitle">CUTE 可愛版地圖</h2>
+      <p class="legend">可愛風總覽圖，快速看全程景點分布。</p>
+      <iframe id="qMap" class="q-map cute" loading="lazy"></iframe>
+    </section>
+
     <section class="grid" id="itinerary"></section>
   </main>
-
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script>
-    const placeCoords = {
-      "成田機場": [35.7730, 140.3929], "輕井澤站": [36.3427, 138.6390], "ANA Holiday Inn Resort Karuizawa": [36.3955, 138.5850],
-      "輕井澤": [36.3486, 138.5969], "草津溫泉湯畑": [36.6230, 138.5969], "Kusatsu Onsen Yubatake Sensui": [36.6224, 138.5964],
-      "草津溫泉": [36.6200, 138.5960], "輕井澤王子購物廣場": [36.3422, 138.6340], "輕井澤住宿": [36.3450, 138.6370],
-      "川越一番街": [35.9237, 139.4855], "川越東武酒店": [35.9066, 139.4825], "川越": [35.9251, 139.4856],
-      "淺草": [35.7148, 139.7967], "東京灣拉維斯塔酒店": [35.6556, 139.7926], "東京灣": [35.6050, 139.7700],
-      "上野": [35.7138, 139.7772], "銀座": [35.6717, 139.7650]
-    };
-
-    const colors = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ec4899"];
-
-    const days = [
-      { title:"Day 1 · 20-21/5", dateLabel:"20-21/5", stay:"住輕井澤 · ANA Holiday Inn Resort Karuizawa", route:["成田機場","輕井澤站","ANA Holiday Inn Resort Karuizawa"], hotelUrl:"https://www.ihg.com/holidayinnresorts/hotels/us/en/karuizawa" },
-      { title:"Day 2 · 21-22/5", dateLabel:"21-22/5", stay:"住草津溫泉 · Kusatsu Onsen Yubatake Sensui", route:["輕井澤","草津溫泉湯畑","Kusatsu Onsen Yubatake Sensui"], hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=121167983&checkIn=2026-05-21&checkOut=2026-05-22&locale=zh-HK" },
-      { title:"Day 3 · 22-23/5", dateLabel:"22-23/5", stay:"住輕井澤", route:["草津溫泉","輕井澤王子購物廣場","輕井澤住宿"], hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=125759448&checkIn=2026-05-22&checkOut=2026-05-23&locale=zh-HK" },
-      { title:"Day 4 · 23-24/5", dateLabel:"23-24/5", stay:"住川越 · 川越東武酒店", route:["輕井澤","川越一番街","川越東武酒店"], hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=1550212&checkIn=2026-05-23&checkOut=2026-05-24&locale=zh-HK" },
-      { title:"Day 5 · 24-25/5", dateLabel:"24-25/5", stay:"住東京 · 東京灣拉維斯塔酒店", route:["川越","淺草","東京灣拉維斯塔酒店"], hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=83067673&checkIn=2026-05-24&checkOut=2026-05-25&locale=zh-HK" },
-      { title:"Day 6 · 25/5", dateLabel:"25/5", stay:"東京市區自由行 + 回程", route:["東京灣","上野","銀座","成田機場"], hotelUrl:"https://www.google.com/maps/search/%E6%88%90%E7%94%B0%E6%A9%9F%E5%A0%B4" }
-    ];
-
-    function dirUrl(route){ return `https://www.google.com/maps/dir/${route.map(encodeURIComponent).join("/")}`; }
-    function embedUrl(route){ return `https://maps.google.com/maps?q=${encodeURIComponent(route.join(" -> "))}&output=embed`; }
-
-    const filterEl = document.getElementById("dateFilter");
-    const root = document.getElementById("itinerary");
-    const overviewTitle = document.getElementById("overviewTitle");
-
-    filterEl.innerHTML = [{ value:"all", label:"全部日期" }, ...days.map((d,i)=>({ value:String(i), label:d.dateLabel }))]
-      .map(o => `<option value="${o.value}">${o.label}</option>`).join("");
-
-    const map = L.map("overviewMap");
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap" }).addTo(map);
-    let markers = [];
-    let polylines = [];
-
-    function addArrow(latlng, color) {
-      const icon = L.divIcon({
-        className: "",
-        html: `<div style="color:${color};font-size:16px;font-weight:700;transform:translate(-50%,-50%);">➜</div>`,
-        iconSize: [16, 16],
-        iconAnchor: [8, 8]
-      });
-      return L.marker(latlng, { icon, interactive: false }).addTo(map);
+    const placeCoords = {"成田機場":[35.7730,140.3929],"輕井澤站":[36.3427,138.6390],"ANA Holiday Inn Resort Karuizawa":[36.3955,138.5850],"輕井澤":[36.3486,138.5969],"草津溫泉湯畑":[36.6230,138.5969],"Kusatsu Onsen Yubatake Sensui":[36.6224,138.5964],"草津溫泉":[36.6200,138.5960],"輕井澤王子購物廣場":[36.3422,138.6340],"輕井澤住宿":[36.3450,138.6370],"川越一番街":[35.9237,139.4855],"川越東武酒店":[35.9066,139.4825],"川越":[35.9251,139.4856],"淺草":[35.7148,139.7967],"東京灣拉維斯塔酒店":[35.6556,139.7926],"東京灣":[35.6050,139.7700],"上野":[35.7138,139.7772],"銀座":[35.6717,139.7650]};
+    const placeIntro = {"成田機場":"東京主要國際機場，交通銜接完整，適合作為行程起終點。","輕井澤站":"輕井澤核心交通站，可轉乘巴士前往度假區與周邊景點。","ANA Holiday Inn Resort Karuizawa":"山景度假型酒店，環境較寧靜，適合放鬆休息。","輕井澤":"知名高原避暑地，街區散步與自然景觀都很受歡迎。","草津溫泉湯畑":"草津地標溫泉源頭，夜間點燈後氣氛特別好。","Kusatsu Onsen Yubatake Sensui":"靠近湯畑的住宿點，步行可到主要溫泉區。","草津溫泉":"日本代表性溫泉鄉，可體驗外湯與溫泉街。","輕井澤王子購物廣場":"大型 outlet 商場，品牌多且鄰近車站。","輕井澤住宿":"回到輕井澤區域住宿，方便隔日移動。","川越一番街":"保留江戶風格老街，適合拍照與邊走邊吃。","川越東武酒店":"位於川越市區，步行逛街與交通都方便。","川越":"東京近郊人氣小旅行地點，有「小江戶」氛圍。","淺草":"東京經典觀光區，雷門與仲見世商店街很集中。","東京灣拉維斯塔酒店":"東京灣沿岸住宿點，夜景與海景視野佳。","東京灣":"臨海區域，周邊景點多，交通方式也很多元。","上野":"博物館、公園、阿美橫町集中，適合白天逛街散步。","銀座":"東京高級購物與美食區，街景整齊且餐廳選擇多。"};
+    const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899"];
+    const days=[{title:"Day 1 · 20-21/5",dateLabel:"20-21/5",stay:"住輕井澤 · ANA Holiday Inn Resort Karuizawa",route:["成田機場","輕井澤站","ANA Holiday Inn Resort Karuizawa"],hotelUrl:"https://www.ihg.com/holidayinnresorts/hotels/us/en/karuizawa"},{title:"Day 2 · 21-22/5",dateLabel:"21-22/5",stay:"住草津溫泉 · Kusatsu Onsen Yubatake Sensui",route:["輕井澤","草津溫泉湯畑","Kusatsu Onsen Yubatake Sensui"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=121167983&checkIn=2026-05-21&checkOut=2026-05-22&locale=zh-HK"},{title:"Day 3 · 22-23/5",dateLabel:"22-23/5",stay:"住輕井澤",route:["草津溫泉","輕井澤王子購物廣場","輕井澤住宿"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=125759448&checkIn=2026-05-22&checkOut=2026-05-23&locale=zh-HK"},{title:"Day 4 · 23-24/5",dateLabel:"23-24/5",stay:"住川越 · 川越東武酒店",route:["輕井澤","川越一番街","川越東武酒店"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=1550212&checkIn=2026-05-23&checkOut=2026-05-24&locale=zh-HK"},{title:"Day 5 · 24-25/5",dateLabel:"24-25/5",stay:"住東京 · 東京灣拉維斯塔酒店",route:["川越","淺草","東京灣拉維斯塔酒店"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=83067673&checkIn=2026-05-24&checkOut=2026-05-25&locale=zh-HK"},{title:"Day 6 · 25/5",dateLabel:"25/5",stay:"東京市區自由行 + 回程",route:["東京灣","上野","銀座","成田機場"],hotelUrl:"https://www.google.com/maps/search/%E6%88%90%E7%94%B0%E6%A9%9F%E5%A0%B4"}];
+    const dirUrl=(route)=>`https://www.google.com/maps/dir/${route.map(encodeURIComponent).join("/")}`;
+    const embedUrl=(route)=>`https://maps.google.com/maps?q=${encodeURIComponent(route.join(" -> "))}&output=embed`;
+    const quickMapUrl=(route)=>`https://maps.google.com/maps?q=${encodeURIComponent(route.join(" | "))}&output=embed`;
+    const filterEl=document.getElementById("dateFilter"),root=document.getElementById("itinerary"),overviewTitle=document.getElementById("overviewTitle"),qMap=document.getElementById("qMap"),qMapTitle=document.getElementById("qMapTitle");
+    filterEl.innerHTML=[{value:"all",label:"全部日期"},...days.map((d,i)=>({value:String(i),label:d.dateLabel}))].map(o=>`<option value="${o.value}">${o.label}</option>`).join("");
+    const map=L.map("overviewMap"); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"&copy; OpenStreetMap"}).addTo(map);
+    let markers=[],polylines=[];
+    function addArrow(latlng,color){const icon=L.divIcon({className:"",html:`<div style="color:${color};font-size:16px;font-weight:700;transform:translate(-50%,-50%);">➜</div>`,iconSize:[16,16],iconAnchor:[8,8]}); return L.marker(latlng,{icon,interactive:false}).addTo(map);}
+    function renderCards(selected){const visible=selected==="all"?days:[days[Number(selected)]]; root.innerHTML=visible.map((d)=>{const spotItems=d.route.map((p)=>`<li><strong>${p}</strong><div class="spot-note">${placeIntro[p]||"行程景點，建議出發前再確認開放時間。"}</div></li>`).join(""); return `<article class="day"><div class="head"><h3>${d.title}</h3><p class="meta">${d.stay}</p></div><div class="body"><ol class="spot-list">${spotItems}</ol><iframe class="map" loading="lazy" src="${embedUrl(d.route)}"></iframe><div class="actions"><a class="btn primary" href="${dirUrl(d.route)}" target="_blank" rel="noopener">開啟路線導航</a><a class="btn" href="${d.hotelUrl}" target="_blank" rel="noopener">住宿連結</a></div></div></article>`;}).join("");}
+    function renderOverview(selected){[...markers,...polylines].forEach(layer=>map.removeLayer(layer)); markers=[]; polylines=[]; const visible=selected==="all"?days:[days[Number(selected)]]; const allPoints=[],allPlaces=[];
+      visible.forEach((d,dayIdx)=>{const color=colors[dayIdx%colors.length],routeCoords=d.route.map((p)=>placeCoords[p]).filter(Boolean); d.route.forEach((p,idx)=>{const c=placeCoords[p]; if(!c)return; markers.push(L.circleMarker(c,{radius:7,color,weight:2,fillColor:"#fff",fillOpacity:1}).addTo(map).bindPopup(`${d.title}<br>${idx+1}. ${p}`)); allPoints.push(c); allPlaces.push(p);});
+      if(routeCoords.length>=2){polylines.push(L.polyline(routeCoords,{color,weight:4,opacity:.85}).addTo(map)); for(let i=0;i<routeCoords.length-1;i++){const mid=[(routeCoords[i][0]+routeCoords[i+1][0])/2,(routeCoords[i][1]+routeCoords[i+1][1])/2]; polylines.push(addArrow(mid,color));}}
+    }); if(allPoints.length)map.fitBounds(allPoints,{padding:[30,30]}); else map.setView([35.68,139.76],9);
+      overviewTitle.textContent=selected==="all"?"6日總地圖（全部景點 + 路線）":`總地圖（${visible[0].dateLabel}）`; qMapTitle.textContent=selected==="all"?"CUTE 可愛版地圖":`CUTE 可愛版（${visible[0].dateLabel}）`; qMap.src=quickMapUrl(allPlaces); setTimeout(()=>map.invalidateSize(),50);
     }
-
-    function renderCards(selected){
-      const visibleDays = selected === "all" ? days : [days[Number(selected)]];
-      root.innerHTML = visibleDays.map((d)=>{
-        const routeItems = d.route.map((p) => `<li>${p}</li>`).join("");
-        const mapLink = dirUrl(d.route);
-        return `<article class="day"><div class="head"><h3>${d.title}</h3><p class="meta">${d.stay}</p></div><div class="body"><ol>${routeItems}</ol><iframe class="map" loading="lazy" src="${embedUrl(d.route)}"></iframe><div class="actions"><a class="btn primary" href="${mapLink}" target="_blank" rel="noopener">開啟路線導航</a><a class="btn" href="${d.hotelUrl}" target="_blank" rel="noopener">住宿連結</a></div></div></article>`;
-      }).join("");
-    }
-
-    function renderOverview(selected){
-      [...markers, ...polylines].forEach(layer => map.removeLayer(layer));
-      markers = []; polylines = [];
-
-      const visibleDays = selected === "all" ? days : [days[Number(selected)]];
-      const allPoints = [];
-
-      visibleDays.forEach((d, dayIdx) => {
-        const color = colors[dayIdx % colors.length];
-        const routeCoords = d.route.map((place) => placeCoords[place]).filter(Boolean);
-
-        d.route.forEach((place, idx) => {
-          const coord = placeCoords[place];
-          if (!coord) return;
-          const marker = L.circleMarker(coord, {
-            radius: 7,
-            color,
-            weight: 2,
-            fillColor: "#fff",
-            fillOpacity: 1
-          }).addTo(map).bindPopup(`${d.title}<br>${idx + 1}. ${place}`);
-          markers.push(marker);
-          allPoints.push(coord);
-        });
-
-        if (routeCoords.length >= 2) {
-          const line = L.polyline(routeCoords, { color, weight: 4, opacity: 0.85 }).addTo(map);
-          polylines.push(line);
-          for (let i = 0; i < routeCoords.length - 1; i++) {
-            const mid = [
-              (routeCoords[i][0] + routeCoords[i + 1][0]) / 2,
-              (routeCoords[i][1] + routeCoords[i + 1][1]) / 2
-            ];
-            polylines.push(addArrow(mid, color));
-          }
-        }
-      });
-
-      if (allPoints.length) map.fitBounds(allPoints, { padding:[30,30] });
-      else map.setView([35.68, 139.76], 9);
-
-      overviewTitle.textContent = selected === "all" ? "6日總地圖（全部景點 + 路線）" : `總地圖（${visibleDays[0].dateLabel}）`;
-      setTimeout(() => map.invalidateSize(), 50);
-    }
-
-    function render(selected){ renderOverview(selected); renderCards(selected); }
-    filterEl.addEventListener("change", (e) => render(e.target.value));
-    render("all");
+    const render=(selected)=>{renderOverview(selected); renderCards(selected);}; filterEl.addEventListener("change",(e)=>render(e.target.value)); render("all");
   </script>
 </body>
 </html>
