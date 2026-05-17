@@ -267,6 +267,7 @@
     const uo871StatusEl=document.getElementById("uo871Status");
     const flightMetaEl=document.getElementById("flightMeta");
     const flightLastUpdatedEl=document.getElementById("flightLastUpdated");
+    const FLIGHT_PROXY_BASE = ""; // 例如: https://your-worker.workers.dev
     filterEl.innerHTML=[{value:"all",label:"全部日期"},...days.map((d,i)=>({value:String(i),label:d.dateLabel}))].map(o=>`<option value="${o.value}">${o.label}</option>`).join("");
     const map=L.map("overviewMap"); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"&copy; OpenStreetMap"}).addTo(map);
     let markers=[],polylines=[];
@@ -280,20 +281,53 @@
     }
     const render=(selected)=>{renderOverview(selected); renderCards(selected);}; filterEl.addEventListener("change",(e)=>render(e.target.value)); render("all");
 
+    function flightLinkHtml(flight) {
+      return `<a class="flight-link" href="https://www.flightaware.com/live/flight/${flight}" target="_blank" rel="noopener">FlightAware ${flight}</a>`;
+    }
+
+    async function fetchFlightStatusViaProxy(flight) {
+      if (!FLIGHT_PROXY_BASE) {
+        throw new Error("proxy_not_configured");
+      }
+      const base = FLIGHT_PROXY_BASE.replace(/\/+$/, "");
+      const resp = await fetch(`${base}/status?flight=${encodeURIComponent(flight)}`, { cache: "no-store" });
+      if (!resp.ok) {
+        throw new Error(`proxy_http_${resp.status}`);
+      }
+      const data = await resp.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      return data;
+    }
+
     async function refreshFlightStatus() {
       refreshBtn.disabled = true;
       refreshBtn.textContent = "更新中...";
       try {
-        uo848StatusEl.innerHTML = '狀態：請按上方 <a class="flight-link" href="https://www.flightaware.com/live/flight/HKE848" target="_blank" rel="noopener">FlightAware HKE848</a> 查看最新';
-        uo871StatusEl.innerHTML = '狀態：請按上方 <a class="flight-link" href="https://www.flightaware.com/live/flight/HKE871" target="_blank" rel="noopener">FlightAware HKE871</a> 查看最新';
+        const [f848, f871] = await Promise.all([
+          fetchFlightStatusViaProxy("HKE848"),
+          fetchFlightStatusViaProxy("HKE871")
+        ]);
+        const dep848 = f848.departure ? `（出發 ${f848.departure}）` : "";
+        const arr848 = f848.arrival ? `（到達 ${f848.arrival}）` : "";
+        const dep871 = f871.departure ? `（出發 ${f871.departure}）` : "";
+        const arr871 = f871.arrival ? `（到達 ${f871.arrival}）` : "";
+        uo848StatusEl.textContent = `狀態：${f848.status || "Unknown"} ${dep848}${arr848}`.trim();
+        uo871StatusEl.textContent = `狀態：${f871.status || "Unknown"} ${dep871}${arr871}`.trim();
+        flightMetaEl.textContent = "來源：FlightAware（經 proxy 自動更新）";
+      } catch (e) {
+        uo848StatusEl.innerHTML = `狀態：請按上方 ${flightLinkHtml("HKE848")} 查看最新`;
+        uo871StatusEl.innerHTML = `狀態：請按上方 ${flightLinkHtml("HKE871")} 查看最新`;
+        const reason = String((e && e.message) ? e.message : e);
+        if (reason === "proxy_not_configured") {
+          flightMetaEl.textContent = "來源：未設定 proxy URL，現使用 FlightAware 連結模式。";
+        } else {
+          flightMetaEl.textContent = "來源：proxy 更新失敗，現使用 FlightAware 連結模式。";
+        }
+      } finally {
         const stamp = new Date().toLocaleString("zh-HK", { hour12: false });
         flightLastUpdatedEl.textContent = `最後更新時間：${stamp}`;
-        flightMetaEl.textContent = "來源：FlightAware（HKE848 / HKE871）";
-      } catch (e) {
-        const stamp = new Date().toLocaleString("zh-HK", { hour12: false });
-        flightLastUpdatedEl.textContent = `最後更新時間：${stamp}（更新失敗）`;
-        flightMetaEl.textContent = "更新失敗：請直接到 FlightAware 頁面查看。";
-      } finally {
         refreshBtn.disabled = false;
         refreshBtn.textContent = "刷新狀態";
       }
