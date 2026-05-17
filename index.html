@@ -1,36 +1,30 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jadon 小故事</title>
-  <style>
-    :root{--bg:#fff8ec;--card:#fff;--ink:#2b2b2b;--muted:#70665a;--accent:#ff8a3d;--blue:#2d8cff;--green:#4caf50;--pink:#ff6fae;}
-    *{box-sizing:border-box}body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;background:linear-gradient(180deg,#fff7df,#eef8ff);color:var(--ink);line-height:1.75}.wrap{max-width:1180px;margin:auto;padding:28px 18px 60px}header{text-align:center;padding:28px 14px 18px}.badge{display:inline-block;background:#fff;border:2px solid #ffd27a;border-radius:999px;padding:6px 14px;color:#8a5a00;font-weight:700}h1{font-size:clamp(34px,6vw,64px);margin:14px 0 6px;letter-spacing:2px}.sub{font-size:20px;color:var(--muted);margin:0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}.card{background:var(--card);border:3px solid #f1d5a7;border-radius:24px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,.08)}.pic{height:190px;position:relative;display:flex;align-items:center;justify-content:center;font-size:58px;background:linear-gradient(135deg,#d8f2ff,#fff2c8)}.pic:before{content:"";position:absolute;inset:14px;border:2px dashed rgba(255,255,255,.9);border-radius:20px}.num{position:absolute;top:12px;left:12px;width:42px;height:42px;border-radius:50%;background:var(--accent);color:white;display:grid;place-items:center;font-size:24px;font-weight:900;box-shadow:0 4px 10px rgba(0,0,0,.16)}.family{position:absolute;right:16px;bottom:10px;font-size:34px}.body{padding:16px 18px 20px}h2{font-size:24px;margin:0 0 8px;color:#2366b0}.story{font-size:18px;margin:0}.moral{margin:14px 0 0;padding:10px 12px;border-radius:14px;background:#fff7e5;border:2px solid #ffe0a3;font-weight:800;color:#a15b00}.quote{color:#d44b4b;font-weight:700}footer{text-align:center;margin-top:30px;font-size:20px;color:#3f5f91;background:white;border-radius:24px;padding:18px;border:2px solid #d9edff}.s1 .pic{background:linear-gradient(135deg,#d6ffd8,#fff4c8)}.s2 .pic{background:linear-gradient(135deg,#ccefff,#fff3ae)}.s3 .pic{background:linear-gradient(135deg,#ffe1b9,#d7f5c8)}.s4 .pic{background:linear-gradient(135deg,#e6f0ff,#fff0d7)}.s5 .pic{background:linear-gradient(135deg,#d8ffd9,#e9f0ff)}.s6 .pic{background:linear-gradient(135deg,#fff0c5,#ffe6e6)}.s7 .pic{background:linear-gradient(135deg,#e3f3ff,#fff7d6)}.s8 .pic{background:linear-gradient(135deg,#e3ffd8,#ffe9c7)}.s9 .pic{background:linear-gradient(135deg,#ffe7c6,#d7f7ff)}.s10 .pic{background:linear-gradient(135deg,#fff5ca,#e0ffe0)}.s11 .pic{background:linear-gradient(135deg,#dfe8ff,#fff9d4)}.s12 .pic{background:linear-gradient(135deg,#ffe3f2,#fff5c7)}@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.pic{height:170px}}@media(max-width:620px){.grid{grid-template-columns:1fr}.story{font-size:17px}.pic{height:165px}}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jadon 的 12 個成長故事</title>
+<style>
+body{margin:0;font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;background:#f5fbff;color:#2b2b2b}.hero{background:linear-gradient(180deg,#cfefff,#fff);padding:34px 18px;text-align:center}.hero h1{font-size:clamp(34px,6vw,68px);margin:0;color:#875018}.hero p{font-size:22px;margin:8px 0;color:#555}.wrap{max-width:1280px;margin:auto;padding:22px}.poster{background:white;border-radius:28px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.12);border:3px solid #dff2ff;text-align:center}.poster img{width:100%;max-width:1200px;border-radius:22px;display:block;margin:auto}.note{margin-top:16px;font-size:18px;color:#666}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:26px}.card{background:white;border-radius:22px;padding:20px;border:2px solid #e8f0ff;box-shadow:0 8px 20px rgba(0,0,0,.06)}.card h2{margin:0 0 8px;color:#2d6cdf}.btn{display:inline-block;margin-top:10px;background:#ff8a3d;color:white;border:none;border-radius:999px;padding:10px 16px;font-size:16px;cursor:pointer}.moral{font-weight:700;color:#965d00;background:#fff6dd;border-radius:12px;padding:10px;margin-top:12px}footer{text-align:center;padding:28px;font-size:18px;color:#555}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="badge">100字左右 · 親子對話 · 每篇一道理</div>
-      <h1>Jadon 小故事</h1>
-      <p class="sub">給小朋友閱讀的中文故事書</p>
-    </header>
-    <main class="grid">
-      <article class="card s1"><div class="pic"><span class="num">1</span>🌳⚽<span class="family">👨‍👩‍👦</span></div><div class="body"><h2>去公園學分享</h2><p class="story">今天，爸爸媽媽帶Jadon去公園玩。公園裡有很多小朋友，有人拍球，有人玩滑梯。Jadon拿著小足球跑來跑去。一個小朋友問：<span class="quote">「我可以一起玩嗎？」</span>Jadon笑著說：<span class="quote">「好呀！」</span>兩人一起傳球，玩得很開心。媽媽說：<span class="quote">「願意分享，朋友會更多。」</span></p><p class="moral">道理：學會分享，朋友會更多。</p></div></article>
-      <article class="card s2"><div class="pic"><span class="num">2</span>🌊🏊<span class="family">👨‍👦</span></div><div class="body"><h2>第一次游水</h2><p class="story">夏天天氣很熱，爸爸帶Jadon去海邊游水。大大的海浪拍過來，Jadon有點怕，拉著爸爸的手。爸爸說：<span class="quote">「不用怕，我會陪住你。」</span>他慢慢學拍水和踢腳。過了一會兒，Jadon笑著叫：<span class="quote">「爸爸，我做到啦！」</span>媽媽在旁邊拍照。</p><p class="moral">道理：不要害怕嘗試，新事情會讓自己進步。</p></div></article>
-      <article class="card s3"><div class="pic"><span class="num">3</span>🐰🏡<span class="family">👩‍👦</span></div><div class="body"><h2>小兔迷路了</h2><p class="story">一天，Jadon和媽媽去農場看動物。Jadon最喜歡白色小兔。忽然，一隻小兔跑出木屋，四處走來走去。Jadon問：<span class="quote">「媽媽，小兔是不是迷路了？」</span>媽媽點點頭。Jadon輕輕抱起小兔，把牠送回木屋。叔叔說：<span class="quote">「謝謝你！」</span></p><p class="moral">道理：幫助別人，自己也會快樂。</p></div></article>
-      <article class="card s4"><div class="pic"><span class="num">4</span>✏️📚<span class="family">👨‍👦</span></div><div class="body"><h2>學寫字</h2><p class="story">今天，爸爸陪Jadon在家裡學寫字。爸爸先寫一、二、三、四、五，再教六、七、八、九、十。Jadon寫得歪歪的，有點不高興：<span class="quote">「我寫不好。」</span>爸爸說：<span class="quote">「不用急，慢慢來。」</span>Jadon再認真寫，最後進步了，媽媽開心拍手。</p><p class="moral">道理：只要有耐心，就會慢慢進步。</p></div></article>
-      <article class="card s5"><div class="pic"><span class="num">5</span>🛝⚽<span class="family">🧒👦👧</span></div><div class="body"><h2>公園的小朋友</h2><p class="story">下午，很多小朋友在公園玩。Jadon和朋友一起踢球、唱歌。忽然，一個小朋友跌倒了，坐在地上哭。Jadon立刻跑過去扶他起來，還幫他拍走沙。老師說：<span class="quote">「Jadon真有愛心。」</span>小朋友也說：<span class="quote">「謝謝你。」</span>大家又一起玩。</p><p class="moral">道理：主動幫助別人，是很重要的。</p></div></article>
-      <article class="card s6"><div class="pic"><span class="num">6</span>🍚🏠<span class="family">👨‍👩‍👦</span></div><div class="body"><h2>一家人的晚飯</h2><p class="story">外面下著大雨，Jadon一家人在家裡吃晚飯。媽媽在廚房炒菜，爸爸把桌子整理好。Jadon也幫忙拿碗和筷子。媽媽說：<span class="quote">「謝謝Jadon。」</span>吃飯時，大家分享今天的事。爸爸說：<span class="quote">「一家人在一起，就是幸福。」</span>Jadon心裡暖暖的。</p><p class="moral">道理：一家人互相關心，就是幸福。</p></div></article>
-      <article class="card s7"><div class="pic"><span class="num">7</span>🚌💺<span class="family">👩‍👦</span></div><div class="body"><h2>巴士上的禮貌</h2><p class="story">今天，媽媽帶Jadon坐巴士去圖書館。巴士站有很多人，大家安靜排隊。上車後，Jadon看見一位婆婆慢慢走上來。媽媽問：<span class="quote">「讓座給婆婆，好嗎？」</span>Jadon立刻站起來：<span class="quote">「婆婆，請坐！」</span>婆婆笑著說：<span class="quote">「你真是好孩子。」</span></p><p class="moral">道理：有禮貌和關心別人，大家都會開心。</p></div></article>
-      <article class="card s8"><div class="pic"><span class="num">8</span>🦒🐘<span class="family">👨‍👩‍👦</span></div><div class="body"><h2>去動物園</h2><p class="story">星期天，爸爸媽媽帶Jadon去動物園。Jadon看見長頸鹿、大象、小羊和白兔。他說：<span class="quote">「爸爸！長頸鹿好高呀！」</span>爸爸笑著說：<span class="quote">「因為牠的頸很長。」</span>後來，海獅拍手、頂球。媽媽提醒：<span class="quote">「看動物時不要推，也不要大叫。」</span></p><p class="moral">道理：欣賞動物時，要愛護和尊重牠們。</p></div></article>
-      <article class="card s9"><div class="pic"><span class="num">9</span>🌸☀️🍁❄️<span class="family">👦</span></div><div class="body"><h2>四季的變化</h2><p class="story">一年有春、夏、秋、冬四季。春天開滿花，小鳥在樹上唱歌；夏天很熱，Jadon最喜歡游泳；秋天的葉子變紅又變黃；冬天很冷，大家穿厚外套。老師問：<span class="quote">「你最喜歡哪一季？」</span>Jadon說：<span class="quote">「每一季都有快樂。」</span></p><p class="moral">道理：學會欣賞生活中的不同美好。</p></div></article>
-      <article class="card s10"><div class="pic"><span class="num">10</span>🍉🍎🍌<span class="family">👨‍👦</span></div><div class="body"><h2>數水果</h2><p class="story">今天，媽媽買了很多水果。桌上有一個大西瓜、三個紅蘋果、五枝香蕉，還有兩個橙。爸爸問：<span class="quote">「Jadon，一共有多少水果？」</span>Jadon伸出小手，一邊數一邊讀：<span class="quote">「一、二、三……」</span>最後他答：<span class="quote">「十一個！」</span>大家一起分享水果。</p><p class="moral">道理：學習和分享，都可以帶來快樂。</p></div></article>
-      <article class="card s11"><div class="pic"><span class="num">11</span>✈️☁️<span class="family">👨‍👩‍👦</span></div><div class="body"><h2>飛機旅行</h2><p class="story">暑假到了，Jadon第一次坐飛機旅行。飛機飛上天空時，他有一點害怕，緊緊拉著媽媽的手。媽媽說：<span class="quote">「不用怕，我們一起看白雲。」</span>爸爸指著窗外：<span class="quote">「下面像小小的積木世界。」</span>Jadon慢慢放鬆，開心地說：<span class="quote">「旅行真有趣！」</span></p><p class="moral">道理：勇敢踏出第一步，就能看見更大的世界。</p></div></article>
-      <article class="card s12"><div class="pic"><span class="num">12</span>🎂🎁<span class="family">👨‍👩‍👦</span></div><div class="body"><h2>小朋友的生日</h2><p class="story">今天是Jadon的生日，很多朋友來參加生日會。桌上有蛋糕、果汁、糖果和禮物。大家一起唱生日歌，Jadon高興得拍手。媽媽說：<span class="quote">「先許願呀。」</span>Jadon閉上眼睛：<span class="quote">「希望大家天天開心。」</span>他把蛋糕分給每一位朋友，房間充滿笑聲。</p><p class="moral">道理：快樂不只是自己擁有，也可以和別人分享。</p></div></article>
-    </main>
-    <footer>🌈 小朋友，生活中有很多美好的事。用心去感受、去學習、去幫助別人，你會更快樂、更聰明！ ⭐</footer>
-  </div>
+<section class="hero"><h1>Jadon 的 12 個成長故事</h1><p>陪伴孩子快樂成長的每一天 💕</p></section>
+<div class="wrap">
+  <section class="poster">
+    <h2>故事總覽圖</h2>
+    <p class="note">呢個位置會放你剛剛嗰張 12 個故事大圖。下一步只要把圖片檔上載到 GitHub，改名做 <b>storybook.jpg</b>，網站就會自動顯示。</p>
+    <img src="storybook.jpg" alt="Jadon 的 12 個成長故事總覽圖" onerror="this.style.display='none';document.getElementById('missing').style.display='block'">
+    <div id="missing" class="note" style="display:none">圖片檔 storybook.jpg 未上載；上載後會在這裡顯示。</div>
+  </section>
+  <section class="grid">
+    <article class="card"><h2>1. 去公園學分享</h2><p id="s1">學習分享，和朋友一起玩，會讓快樂加倍！</p><div class="moral">道理：學會分享，朋友會更多。</div><button class="btn" onclick="speak('s1')">🔊 廣東話朗讀</button></article>
+    <article class="card"><h2>2. 第一次游水</h2><p id="s2">勇敢嘗試新事物，你會發現自己比想像中更厲害！</p><div class="moral">道理：勇敢嘗試，就會進步。</div><button class="btn" onclick="speak('s2')">🔊 廣東話朗讀</button></article>
+    <article class="card"><h2>3. 小兔迷路了</h2><p id="s3">幫助別人，是一件很有意義、很快樂的事。</p><div class="moral">道理：幫助別人，自己也會快樂。</div><button class="btn" onclick="speak('s3')">🔊 廣東話朗讀</button></article>
+    <article class="card"><h2>4. 學寫字</h2><p id="s4">只要有耐心，不斷練習，你一定會越來越進步！</p><div class="moral">道理：只要有耐心，就會進步。</div><button class="btn" onclick="speak('s4')">🔊 廣東話朗讀</button></article>
+  </section>
+</div>
+<footer>🌈 用心去感受、去學習、去幫助別人，你會更快樂、更聰明！</footer>
+<script>function speak(id){let u=new SpeechSynthesisUtterance(document.getElementById(id).innerText);u.lang='zh-HK';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}</script>
 </body>
 </html>
