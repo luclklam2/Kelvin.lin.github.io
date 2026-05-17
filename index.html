@@ -49,4 +49,94 @@ function setupText(){document.querySelectorAll('.readText').forEach(p=>{let t=p.
 function playStory(n){let p=document.getElementById('s'+n),text=p.dataset.text||p.innerText;let u=new SpeechSynthesisUtterance(text);u.lang=lang==='zh'?'zh-HK':'en-US';u.rate=lang==='zh'?.88:.82;u.onboundary=e=>{let chars=p.querySelectorAll('.char');chars.forEach(x=>x.classList.remove('active'));let i=Math.min(chars.length-1,e.charIndex);if(chars[i])chars[i].classList.add('active')};speechSynthesis.cancel();speechSynthesis.speak(u)}
 function playAll(){let i=1;speechSynthesis.cancel();function next(){if(i>12)return;let p=document.getElementById('s'+i);let u=new SpeechSynthesisUtterance(p.dataset.text);u.lang=lang==='zh'?'zh-HK':'en-US';u.rate=lang==='zh'?.88:.82;u.onend=()=>{i++;next()};speechSynthesis.speak(u)}next()}
 function openZoom(){document.querySelector('.modal').classList.add('open')}function closeZoom(){document.querySelector('.modal').classList.remove('open')}render();
-</script></body></html>
+</script>
+<script>
+(()=>{
+  const style=document.createElement('style');
+  style.textContent=`
+  :root{--reader-scale:1}
+  .fontctrl{display:inline-flex;gap:6px;margin-left:12px;vertical-align:middle}
+  .fontbtn{border:2px solid #9ec4ff;background:#fff;color:#225bbf;border-radius:999px;padding:8px 12px;font-size:14px;font-weight:700;cursor:pointer}
+  .fontbtn.active{background:#2d6cdf;color:#fff;border-color:#2d6cdf}
+  .card h2{font-size:calc(25px * var(--reader-scale))}
+  .card p{font-size:calc(19px * var(--reader-scale))}
+  .moral{font-size:calc(20px * var(--reader-scale) / 1.35)}
+  @media(max-width:640px){.card p{font-size:calc(17px * var(--reader-scale))}}
+  `;
+  document.head.appendChild(style);
+
+  let fontScale=1;
+  let activeStory=null;
+
+  function applyFontScale(v){
+    fontScale=v;
+    document.documentElement.style.setProperty('--reader-scale',String(v));
+    document.querySelectorAll('.fontbtn').forEach(b=>b.classList.remove('active'));
+    const id=v===0.9?'fontSm':(v===1?'fontMd':'fontLg');
+    const btn=document.getElementById(id); if(btn) btn.classList.add('active');
+  }
+
+  function installFontControls(){
+    const bar=document.querySelector('.langbar');
+    if(!bar || document.querySelector('.fontctrl')) return;
+    const wrap=document.createElement('span');
+    wrap.className='fontctrl';
+    wrap.innerHTML='<button class="fontbtn" id="fontSm" type="button">A-</button><button class="fontbtn" id="fontMd" type="button">A</button><button class="fontbtn" id="fontLg" type="button">A+</button>';
+    bar.appendChild(wrap);
+    document.getElementById('fontSm').onclick=()=>applyFontScale(0.9);
+    document.getElementById('fontMd').onclick=()=>applyFontScale(1);
+    document.getElementById('fontLg').onclick=()=>applyFontScale(1.1);
+    applyFontScale(1);
+  }
+
+  function syncStoryButtons(){
+    document.querySelectorAll('#grid article.card button.btn').forEach((btn,idx)=>{
+      const n=idx+1;
+      btn.id='storyBtn'+n;
+      btn.dataset.story=String(n);
+      if(activeStory===n && speechSynthesis.speaking){
+        btn.textContent=speechSynthesis.paused?'▶️ 繼續':'⏸️ 暫停';
+      }else{
+        btn.textContent=lang==='zh'?'🎙️ 廣東話跟讀':'🎙️ Read Aloud';
+      }
+    });
+  }
+
+  const _render=render;
+  render=function(){ _render(); syncStoryButtons(); installFontControls(); };
+
+  playStory=function(n){
+    const p=document.getElementById('s'+n);
+    if(!p) return;
+
+    if(activeStory===n && speechSynthesis.speaking){
+      if(speechSynthesis.paused) speechSynthesis.resume(); else speechSynthesis.pause();
+      syncStoryButtons();
+      return;
+    }
+
+    speechSynthesis.cancel();
+    activeStory=n;
+    const text=p.dataset.text||p.innerText;
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=lang==='zh'?'zh-HK':'en-US';
+    u.rate=lang==='zh'?0.88:0.82;
+    u.onboundary=e=>{
+      const chars=p.querySelectorAll('.char');
+      chars.forEach(x=>x.classList.remove('active'));
+      const i=Math.min(chars.length-1,e.charIndex);
+      if(chars[i]) chars[i].classList.add('active');
+    };
+    u.onend=()=>{ activeStory=null; syncStoryButtons(); };
+    speechSynthesis.speak(u);
+    syncStoryButtons();
+  };
+
+  const _playAll=playAll;
+  playAll=function(){ activeStory=null; _playAll(); syncStoryButtons(); };
+
+  syncStoryButtons();
+  installFontControls();
+})();
+</script>
+</body></html>
