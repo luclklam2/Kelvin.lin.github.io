@@ -88,16 +88,32 @@ function renderOverview(selected){[...markers,...polylines].forEach(l=>map.remov
 
 async function fetchDayWeather(day){
   const [lat,lon]=day.weatherPoint;
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&start_date=${day.date}&end_date=${day.date}`;
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,precipitation_probability&timezone=Asia%2FTokyo&start_date=${day.date}&end_date=${day.date}`;
   const res=await fetch(url,{cache:"no-store"});
   if(!res.ok) throw new Error("wx_fetch_failed");
   const data=await res.json();
-  return {tMin:data?.daily?.temperature_2m_min?.[0],tMax:data?.daily?.temperature_2m_max?.[0],rain:data?.daily?.precipitation_probability_max?.[0]};
+  const times=data?.hourly?.time||[];
+  const temps=data?.hourly?.temperature_2m||[];
+  const rains=data?.hourly?.precipitation_probability||[];
+  const tempWin=[];
+  const rainWin=[];
+  for(let i=0;i<times.length;i++){
+    const hh=Number(String(times[i]).slice(11,13));
+    if(hh>=10 && hh<=21){
+      if(Number.isFinite(temps[i])) tempWin.push(temps[i]);
+      if(Number.isFinite(rains[i])) rainWin.push(rains[i]);
+    }
+  }
+  return {
+    tMin: tempWin.length ? Math.min(...tempWin) : null,
+    tMax: tempWin.length ? Math.max(...tempWin) : null,
+    rain: rainWin.length ? Math.max(...rainWin) : null
+  };
 }
 
 async function renderWeather(selected){
   const indexes=selected==="all"?days.map((_,i)=>i):[Number(selected)];
-  await Promise.all(indexes.map(async(i)=>{const el=document.getElementById(`wx-${i}`); if(!el) return; try{const w=await fetchDayWeather(days[i]); const min=Number.isFinite(w.tMin)?Math.round(w.tMin):"-"; const max=Number.isFinite(w.tMax)?Math.round(w.tMax):"-"; const rain=Number.isFinite(w.rain)?Math.round(w.rain):"-"; el.innerHTML=`${min}°C - ${max}°C<br>落雨機會 ${rain}%`; }catch{ el.textContent="天氣資料稍後"; }}));
+  await Promise.all(indexes.map(async(i)=>{const el=document.getElementById(`wx-${i}`); if(!el) return; try{const w=await fetchDayWeather(days[i]); const min=Number.isFinite(w.tMin)?Math.round(w.tMin):"-"; const max=Number.isFinite(w.tMax)?Math.round(w.tMax):"-"; const rain=Number.isFinite(w.rain)?Math.round(w.rain):"-"; el.innerHTML=`${min}°C - ${max}°C<br>落雨機會 ${rain}%<br><small>10:00-21:00</small>`; }catch{ el.textContent="天氣資料稍後"; }}));
 }
 
 const render=(s)=>{renderOverview(s);renderCards(s)};filterEl.addEventListener("change",(e)=>render(e.target.value));render("all");
