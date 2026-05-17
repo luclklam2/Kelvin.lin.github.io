@@ -26,7 +26,37 @@
       padding: 24px 16px 56px;
     }
     h1 { margin: 8px 0 6px; font-size: 2rem; }
-    .sub { margin: 0 0 20px; color: var(--soft); }
+    .sub { margin: 0 0 14px; color: var(--soft); }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 14px;
+    }
+    .toolbar label { font-weight: 700; }
+    .toolbar select {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .overview {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      margin: 0 0 14px;
+      box-shadow: 0 8px 24px rgba(10, 40, 40, 0.08);
+    }
+    .overview h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -44,7 +74,7 @@
       border-bottom: 1px solid var(--line);
       background: linear-gradient(135deg, #ecfeff, #f8fafc 70%);
     }
-    .day h2 { margin: 0; font-size: 1.1rem; }
+    .day h3 { margin: 0; font-size: 1.1rem; }
     .meta { margin: 4px 0 0; color: var(--soft); font-size: 0.9rem; }
     .body { padding: 14px; }
     ol { margin: 0 0 12px; padding-left: 18px; }
@@ -57,6 +87,7 @@
       margin-top: 8px;
       background: #eef2f5;
     }
+    .map.big { height: 360px; margin-top: 0; }
     .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
     .btn {
       text-decoration: none;
@@ -74,45 +105,68 @@
   <main class="wrap">
     <h1>日本 6 日行程</h1>
     <p class="sub">根據你提供的 TRIP 試算表整理，含每日動線與地圖路線。</p>
+
+    <div class="toolbar">
+      <label for="dateFilter">日期 Filter：</label>
+      <select id="dateFilter"></select>
+    </div>
+
+    <section class="overview">
+      <h2 id="overviewTitle">6日總地圖（全部）</h2>
+      <iframe id="overviewMap" class="map big" loading="lazy"></iframe>
+    </section>
+
     <section class="grid" id="itinerary"></section>
   </main>
 
   <script>
     const days = [
       {
+        id: "all",
         title: "Day 1 · 20-21/5",
+        dateLabel: "20-21/5",
         stay: "住輕井澤 · ANA Holiday Inn Resort Karuizawa",
         route: ["成田機場", "輕井澤站", "ANA Holiday Inn Resort Karuizawa"],
         hotelUrl: "https://www.ihg.com/holidayinnresorts/hotels/us/en/karuizawa"
       },
       {
+        id: "d2",
         title: "Day 2 · 21-22/5",
+        dateLabel: "21-22/5",
         stay: "住草津溫泉 · Kusatsu Onsen Yubatake Sensui",
         route: ["輕井澤", "草津溫泉湯畑", "Kusatsu Onsen Yubatake Sensui"],
         hotelUrl: "https://hk.trip.com/hotels/detail/?hotelId=121167983&checkIn=2026-05-21&checkOut=2026-05-22&locale=zh-HK"
       },
       {
+        id: "d3",
         title: "Day 3 · 22-23/5",
+        dateLabel: "22-23/5",
         stay: "住輕井澤",
         route: ["草津溫泉", "輕井澤王子購物廣場", "輕井澤住宿"],
         hotelUrl: "https://hk.trip.com/hotels/detail/?hotelId=125759448&checkIn=2026-05-22&checkOut=2026-05-23&locale=zh-HK"
       },
       {
+        id: "d4",
         title: "Day 4 · 23-24/5",
+        dateLabel: "23-24/5",
         stay: "住川越 · 川越東武酒店",
         route: ["輕井澤", "川越一番街", "川越東武酒店"],
         hotelUrl: "https://hk.trip.com/hotels/detail/?hotelId=1550212&checkIn=2026-05-23&checkOut=2026-05-24&locale=zh-HK"
       },
       {
+        id: "d5",
         title: "Day 5 · 24-25/5",
+        dateLabel: "24-25/5",
         stay: "住東京 · 東京灣拉維斯塔酒店",
         route: ["川越", "淺草", "東京灣拉維斯塔酒店"],
         hotelUrl: "https://hk.trip.com/hotels/detail/?hotelId=83067673&checkIn=2026-05-24&checkOut=2026-05-25&locale=zh-HK"
       },
       {
+        id: "d6",
         title: "Day 6 · 25/5",
+        dateLabel: "25/5",
         stay: "東京市區自由行 + 回程",
-        route: ["東京灣", "上野/銀座", "成田機場"],
+        route: ["東京灣", "上野", "銀座", "成田機場"],
         hotelUrl: "https://www.google.com/maps/search/%E6%88%90%E7%94%B0%E6%A9%9F%E5%A0%B4"
       }
     ];
@@ -126,27 +180,61 @@
       return `https://maps.google.com/maps?q=${encodeURIComponent(route.join(" -> "))}&output=embed`;
     }
 
+    const filterEl = document.getElementById("dateFilter");
     const root = document.getElementById("itinerary");
-    root.innerHTML = days.map((d) => {
-      const routeItems = d.route.map((p) => `<li>${p}</li>`).join("");
-      const mapLink = dirUrl(d.route);
-      return `
-        <article class="day">
-          <div class="head">
-            <h2>${d.title}</h2>
-            <p class="meta">${d.stay}</p>
-          </div>
-          <div class="body">
-            <ol>${routeItems}</ol>
-            <iframe class="map" loading="lazy" src="${embedUrl(d.route)}"></iframe>
-            <div class="actions">
-              <a class="btn primary" href="${mapLink}" target="_blank" rel="noopener">開啟路線導航</a>
-              <a class="btn" href="${d.hotelUrl}" target="_blank" rel="noopener">住宿連結</a>
+    const overviewMap = document.getElementById("overviewMap");
+    const overviewTitle = document.getElementById("overviewTitle");
+
+    const options = [
+      { value: "all", label: "全部日期" },
+      ...days.map((d, i) => ({ value: String(i), label: d.dateLabel }))
+    ];
+
+    filterEl.innerHTML = options.map((o) => `<option value="${o.value}">${o.label}</option>`).join("");
+
+    function renderCards(selected) {
+      const visibleDays = selected === "all" ? days : [days[Number(selected)]];
+      root.innerHTML = visibleDays.map((d) => {
+        const routeItems = d.route.map((p) => `<li>${p}</li>`).join("");
+        const mapLink = dirUrl(d.route);
+        return `
+          <article class="day">
+            <div class="head">
+              <h3>${d.title}</h3>
+              <p class="meta">${d.stay}</p>
             </div>
-          </div>
-        </article>
-      `;
-    }).join("");
+            <div class="body">
+              <ol>${routeItems}</ol>
+              <iframe class="map" loading="lazy" src="${embedUrl(d.route)}"></iframe>
+              <div class="actions">
+                <a class="btn primary" href="${mapLink}" target="_blank" rel="noopener">開啟路線導航</a>
+                <a class="btn" href="${d.hotelUrl}" target="_blank" rel="noopener">住宿連結</a>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderOverview(selected) {
+      const visibleDays = selected === "all" ? days : [days[Number(selected)]];
+      const allPoints = visibleDays.flatMap((d) => d.route);
+      overviewMap.src = embedUrl(allPoints);
+      overviewTitle.textContent = selected === "all"
+        ? "6日總地圖（全部）"
+        : `總地圖（${visibleDays[0].dateLabel}）`;
+    }
+
+    function render(selected) {
+      renderOverview(selected);
+      renderCards(selected);
+    }
+
+    filterEl.addEventListener("change", (e) => {
+      render(e.target.value);
+    });
+
+    render("all");
   </script>
 </body>
 </html>
