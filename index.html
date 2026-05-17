@@ -55,8 +55,8 @@ function openZoom(){document.querySelector('.modal').classList.add('open')}funct
   const style=document.createElement('style');
   style.textContent=`
   :root{--reader-scale:1}
-  .fontctrl{display:inline-flex;gap:6px;margin-left:12px;vertical-align:middle}
-  .fontbtn{border:2px solid #9ec4ff;background:#fff;color:#225bbf;border-radius:999px;padding:8px 12px;font-size:14px;font-weight:700;cursor:pointer}
+  .fontctrl{display:inline-flex;gap:6px;margin-left:12px;vertical-align:middle;flex-wrap:wrap}
+  .fontbtn{border:2px solid #9ec4ff;background:#fff;color:#225bbf;border-radius:999px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;min-width:44px}
   .fontbtn.active{background:#2d6cdf;color:#fff;border-color:#2d6cdf}
   .card h2{font-size:calc(25px * var(--reader-scale))}
   .card p{font-size:calc(19px * var(--reader-scale))}
@@ -83,8 +83,8 @@ function openZoom(){document.querySelector('.modal').classList.add('open')}funct
   function applyFontScale(v){
     document.documentElement.style.setProperty('--reader-scale',String(v));
     document.querySelectorAll('.fontbtn').forEach(b=>b.classList.remove('active'));
-    const id=v===0.9?'fontSm':(v===1?'fontMd':'fontLg');
-    const btn=document.getElementById(id); if(btn) btn.classList.add('active');
+    const map={0.85:'fontXs',0.95:'fontSm',1:'fontMd',1.1:'fontLg',1.2:'fontXl'};
+    const btn=document.getElementById(map[v]); if(btn) btn.classList.add('active');
   }
 
   function installFontControls(){
@@ -92,11 +92,13 @@ function openZoom(){document.querySelector('.modal').classList.add('open')}funct
     if(!bar || document.querySelector('.fontctrl')) return;
     const wrap=document.createElement('span');
     wrap.className='fontctrl';
-    wrap.innerHTML='<button class="fontbtn" id="fontSm" type="button">A-</button><button class="fontbtn" id="fontMd" type="button">A</button><button class="fontbtn" id="fontLg" type="button">A+</button>';
+    wrap.innerHTML='<button class="fontbtn" id="fontXs" type="button">A--</button><button class="fontbtn" id="fontSm" type="button">A-</button><button class="fontbtn" id="fontMd" type="button">A</button><button class="fontbtn" id="fontLg" type="button">A+</button><button class="fontbtn" id="fontXl" type="button">A++</button>';
     bar.appendChild(wrap);
-    document.getElementById('fontSm').onclick=()=>applyFontScale(0.9);
+    document.getElementById('fontXs').onclick=()=>applyFontScale(0.85);
+    document.getElementById('fontSm').onclick=()=>applyFontScale(0.95);
     document.getElementById('fontMd').onclick=()=>applyFontScale(1);
     document.getElementById('fontLg').onclick=()=>applyFontScale(1.1);
+    document.getElementById('fontXl').onclick=()=>applyFontScale(1.2);
     applyFontScale(1);
   }
 
