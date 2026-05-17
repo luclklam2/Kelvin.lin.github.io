@@ -75,6 +75,23 @@
       color: #7d2a1a;
       letter-spacing: 0.2px;
     }
+    .flight-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .refresh-btn {
+      border: 1px solid #dfcbb3;
+      background: #fff;
+      color: #6a3a2a;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .refresh-btn:hover { background: #fff7ee; }
     .flight-row { font-size: 0.9rem; margin: 4px 0; }
     .flight-sub { font-size: 0.78rem; color: var(--soft); margin-top: 6px; }
     @media (max-width: 900px) {
@@ -176,12 +193,17 @@
         <p class="sub">根據你提供的 TRIP 試算表整理，含每日動線與地圖路線。</p>
       </div>
       <aside class="flight-box">
-        <h3>航班時間</h3>
+        <div class="flight-head">
+          <h3>航班時間</h3>
+          <button id="refreshFlightBtn" class="refresh-btn" type="button">刷新狀態</button>
+        </div>
         <div class="flight-row"><strong>UO848</strong> 去程 HKG → NRT</div>
         <div class="flight-row">出發 09:15（香港） · 到達 14:25（東京）</div>
+        <div id="uo848Status" class="flight-row">狀態：待刷新</div>
         <div class="flight-row"><strong>UO871</strong> 回程 NRT → HKG</div>
         <div class="flight-row">出發 17:05（東京） · 到達 21:00（香港）</div>
-        <div class="flight-sub">來源：HK Express 常規班表 + HKIA 最近航班紀錄</div>
+        <div id="uo871Status" class="flight-row">狀態：待刷新</div>
+        <div id="flightMeta" class="flight-sub">來源：HKIA 官方資料（最近可用紀錄）</div>
       </aside>
     </div>
     <div class="toolbar"><label for="dateFilter">日期 Filter：</label><select id="dateFilter"></select></div>
@@ -203,6 +225,10 @@
     const dirUrl=(route)=>`https://www.google.com/maps/dir/${route.map(encodeURIComponent).join("/")}`;
     const embedUrl=(route)=>`https://maps.google.com/maps?q=${encodeURIComponent(route.join(" -> "))}&output=embed`;
     const filterEl=document.getElementById("dateFilter"),root=document.getElementById("itinerary"),overviewTitle=document.getElementById("overviewTitle");
+    const refreshBtn=document.getElementById("refreshFlightBtn");
+    const uo848StatusEl=document.getElementById("uo848Status");
+    const uo871StatusEl=document.getElementById("uo871Status");
+    const flightMetaEl=document.getElementById("flightMeta");
     filterEl.innerHTML=[{value:"all",label:"全部日期"},...days.map((d,i)=>({value:String(i),label:d.dateLabel}))].map(o=>`<option value="${o.value}">${o.label}</option>`).join("");
     const map=L.map("overviewMap"); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"&copy; OpenStreetMap"}).addTo(map);
     let markers=[],polylines=[];
@@ -215,6 +241,59 @@
       overviewTitle.textContent=selected==="all"?"6日總地圖（全部景點 + 路線）":`總地圖（${visible[0].dateLabel}）`; setTimeout(()=>map.invalidateSize(),50);
     }
     const render=(selected)=>{renderOverview(selected); renderCards(selected);}; filterEl.addEventListener("change",(e)=>render(e.target.value)); render("all");
+
+    async function fetchHkiaPast(dateStr, arrival) {
+      const url = `https://www.hongkongairport.com/flightinfo-rest/rest/flights/past?date=${dateStr}&arrival=${arrival}&cargo=false&lang=zh_HK`;
+      const resp = await fetch(url, { cache: "no-store" });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      return resp.json();
+    }
+
+    function findFlight(list, no) {
+      return (list || []).find((item) => (item.flight || []).some((f) => String(f.no || "").replace(/\s+/g, "") === no));
+    }
+
+    function formatLocalDate(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    async function refreshFlightStatus() {
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = "更新中...";
+      try {
+        const now = new Date();
+        const dates = [1,2,3].map((n) => formatLocalDate(new Date(now.getTime() - n * 86400000)));
+        let depHit = null;
+        let arrHit = null;
+
+        for (const d of dates) {
+          if (!depHit) {
+            const dep = await fetchHkiaPast(d, false);
+            depHit = findFlight(dep.list, "UO848");
+          }
+          if (!arrHit) {
+            const arr = await fetchHkiaPast(d, true);
+            arrHit = findFlight(arr.list, "UO871");
+          }
+          if (depHit && arrHit) break;
+        }
+
+        uo848StatusEl.textContent = depHit ? `狀態：${depHit.status || "N/A"}` : "狀態：未找到最新紀錄";
+        uo871StatusEl.textContent = arrHit ? `狀態：${arrHit.status || "N/A"}` : "狀態：未找到最新紀錄";
+        const stamp = new Date().toLocaleString("zh-HK", { hour12: false });
+        flightMetaEl.textContent = `已更新：${stamp}（HKIA 官方資料）`;
+      } catch (e) {
+        flightMetaEl.textContent = "更新失敗：可稍後重試，或以航空公司官方頁面為準。";
+      } finally {
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = "刷新狀態";
+      }
+    }
+
+    refreshBtn.addEventListener("click", refreshFlightStatus);
   </script>
 </body>
 </html>
