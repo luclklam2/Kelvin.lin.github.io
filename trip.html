@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TRIP 6日行程</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
     :root { --bg:#fff6ef;--ink:#322219;--soft:#776256;--brand:#eb5a2f;--line:#efd9c4;--card:#fffdf9; }
     *{box-sizing:border-box} body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;color:var(--ink);background:radial-gradient(circle at 90% 0%,rgba(235,90,47,.22),transparent 34%),radial-gradient(circle at 10% 20%,rgba(23,143,143,.17),transparent 30%),var(--bg)}
@@ -20,7 +17,9 @@
     .overview{border:1px solid var(--line);border-radius:20px;padding:16px}.legend{color:var(--soft)} #overviewMap{width:100%;height:420px;border-radius:12px;border:2px solid #f2dcc7}
     .cute-board{margin-top:14px;border:1px solid var(--line);border-radius:14px;padding:12px}.cute-board img{width:100%;display:block;border-radius:10px;border:2px solid #ffe3d6}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px;margin-top:16px}.day{border:1px solid #efdccb;border-radius:16px;overflow:hidden}
-    .head{padding:14px;border-bottom:1px solid #efddcc}.body{padding:14px}.map{width:100%;height:220px;border:2px solid #efd8c3;border-radius:12px;margin-top:8px}
+    .head{padding:14px;border-bottom:1px solid #efddcc}.head-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .wx-badge{font-size:.8rem;color:#694b3f;background:#fff8f1;border:1px solid #f0d7c3;border-radius:12px;padding:6px 8px;min-width:118px;text-align:right;line-height:1.35}
+    .body{padding:14px}.map{width:100%;height:220px;border:2px solid #efd8c3;border-radius:12px;margin-top:8px}
     .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.btn{padding:8px 12px;border-radius:10px;border:1px solid #eacfb7;text-decoration:none;color:var(--ink)}.btn.primary{background:#d5481b;color:#fff}
   </style>
 </head>
@@ -58,7 +57,14 @@
 const placeCoords={"成田機場":[35.7730,140.3929],"輕井澤站":[36.3427,138.6390],"ANA Holiday Inn Resort Karuizawa":[36.3955,138.5850],"輕井澤":[36.3486,138.5969],"草津溫泉湯畑":[36.6230,138.5969],"Kusatsu Onsen Yubatake Sensui":[36.6224,138.5964],"草津溫泉":[36.6200,138.5960],"輕井澤王子購物廣場":[36.3422,138.6340],"川越一番街":[35.9237,139.4855],"皇家帕恩斯酒店浦和":[35.8586,139.6575],"川越":[35.9251,139.4856],"淺草":[35.7148,139.7967],"東京灣拉維斯塔酒店":[35.6556,139.7926],"東京灣":[35.6050,139.7700],"上野":[35.7138,139.7772],"銀座":[35.6717,139.7650]};
 const placeIntro={"成田機場":"東京主要國際機場，交通銜接完整。","輕井澤站":"輕井澤核心交通站。","ANA Holiday Inn Resort Karuizawa":"山景度假型酒店。","輕井澤":"知名高原避暑地。","草津溫泉湯畑":"草津地標溫泉源頭。","Kusatsu Onsen Yubatake Sensui":"靠近湯畑的住宿點。","草津溫泉":"日本代表性溫泉鄉。","輕井澤王子購物廣場":"大型 outlet 商場。","川越一番街":"江戶風格老街。","皇家帕恩斯酒店浦和":"浦和地區商務酒店。","川越":"東京近郊人氣小旅行地點。","淺草":"東京經典觀光區。","東京灣拉維斯塔酒店":"東京灣沿岸住宿點。","東京灣":"臨海區域。","上野":"博物館公園集中。","銀座":"東京高級購物與美食區。"};
 const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899"];
-const days=[{title:"Day 1 · 20-21/5",dateLabel:"20-21/5",stay:"住輕井澤 · ANA輕井澤假日酒店（ANA Holiday Inn Resort Karuizawa）",route:["成田機場","輕井澤站","ANA Holiday Inn Resort Karuizawa"],hotelUrl:"https://www.ihg.com/holidayinnresorts/hotels/us/en/karuizawa"},{title:"Day 2 · 21-22/5",dateLabel:"21-22/5",stay:"住草津溫泉 · Kusatsu Onsen Yubatake Sensui",route:["輕井澤","草津溫泉湯畑","Kusatsu Onsen Yubatake Sensui"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=121167983&checkIn=2026-05-21&checkOut=2026-05-22&locale=zh-HK"},{title:"Day 3 · 22-23/5",dateLabel:"22-23/5",stay:"住輕井澤 · ANA輕井澤假日酒店（ANA Holiday Inn Resort Karuizawa）",route:["草津溫泉","輕井澤王子購物廣場","ANA Holiday Inn Resort Karuizawa"],hotelUrl:"https://www.ihg.com/holidayinnresorts/hotels/us/en/karuizawa"},{title:"Day 4 · 23-24/5",dateLabel:"23-24/5",stay:"住浦和 · 皇家帕恩斯酒店浦和",route:["輕井澤","川越一番街","皇家帕恩斯酒店浦和"],hotelUrl:"https://www.google.com/maps/search/%E7%9A%87%E5%AE%B6%E5%B8%95%E6%81%A9%E6%96%AF%E9%85%92%E5%BA%97%E6%B5%A6%E5%92%8C"},{title:"Day 5 · 24-25/5",dateLabel:"24-25/5",stay:"住東京 · 東京灣拉維斯塔酒店",route:["川越","淺草","東京灣拉維斯塔酒店"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=83067673&checkIn=2026-05-24&checkOut=2026-05-25&locale=zh-HK"},{title:"Day 6 · 25/5",dateLabel:"25/5",stay:"東京市區自由行 + 回程",route:["東京灣","上野","銀座","成田機場"],hotelUrl:"https://www.google.com/maps/search/%E6%88%90%E7%94%B0%E6%A9%9F%E5%A0%B4"}];
+const days=[
+{title:"Day 1 · 20-21/5",dateLabel:"20-21/5",date:"2026-05-20",weatherPoint:[35.77,140.39],stay:"住輕井澤 · ANA輕井澤假日酒店（ANA Holiday Inn Resort Karuizawa）",route:["成田機場","輕井澤站","ANA Holiday Inn Resort Karuizawa"],hotelUrl:"https://www.ihg.com/holidayinnresorts/hotels/us/en/karuizawa"},
+{title:"Day 2 · 21-22/5",dateLabel:"21-22/5",date:"2026-05-21",weatherPoint:[36.623,138.597],stay:"住草津溫泉 · Kusatsu Onsen Yubatake Sensui",route:["輕井澤","草津溫泉湯畑","Kusatsu Onsen Yubatake Sensui"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=121167983&checkIn=2026-05-21&checkOut=2026-05-22&locale=zh-HK"},
+{title:"Day 3 · 22-23/5",dateLabel:"22-23/5",date:"2026-05-22",weatherPoint:[36.35,138.63],stay:"住輕井澤 · ANA輕井澤假日酒店（ANA Holiday Inn Resort Karuizawa）",route:["草津溫泉","輕井澤王子購物廣場","ANA Holiday Inn Resort Karuizawa"],hotelUrl:"https://www.ihg.com/holidayinnresorts/hotels/us/en/karuizawa"},
+{title:"Day 4 · 23-24/5",dateLabel:"23-24/5",date:"2026-05-23",weatherPoint:[35.86,139.66],stay:"住浦和 · 皇家帕恩斯酒店浦和",route:["輕井澤","川越一番街","皇家帕恩斯酒店浦和"],hotelUrl:"https://www.google.com/maps/search/%E7%9A%87%E5%AE%B6%E5%B8%95%E6%81%A9%E6%96%AF%E9%85%92%E5%BA%97%E6%B5%A6%E5%92%8C"},
+{title:"Day 5 · 24-25/5",dateLabel:"24-25/5",date:"2026-05-24",weatherPoint:[35.66,139.79],stay:"住東京 · 東京灣拉維斯塔酒店",route:["川越","淺草","東京灣拉維斯塔酒店"],hotelUrl:"https://hk.trip.com/hotels/detail/?hotelId=83067673&checkIn=2026-05-24&checkOut=2026-05-25&locale=zh-HK"},
+{title:"Day 6 · 25/5",dateLabel:"25/5",date:"2026-05-25",weatherPoint:[35.68,139.76],stay:"東京市區自由行 + 回程",route:["東京灣","上野","銀座","成田機場"],hotelUrl:"https://www.google.com/maps/search/%E6%88%90%E7%94%B0%E6%A9%9F%E5%A0%B4"}
+];
 const dirUrl=(route)=>`https://www.google.com/maps/dir/${route.map(encodeURIComponent).join("/")}`;
 const embedUrl=(route)=>`https://maps.google.com/maps?q=${encodeURIComponent(route.join(" -> "))}&output=embed`;
 const filterEl=document.getElementById("dateFilter"),root=document.getElementById("itinerary"),overviewTitle=document.getElementById("overviewTitle");
@@ -69,9 +75,31 @@ const flightMetaEl=document.getElementById("flightMeta"); const flightLastUpdate
 const FLIGHT_PROXY_BASE="";
 filterEl.innerHTML=[{value:"all",label:"全部日期"},...days.map((d,i)=>({value:String(i),label:d.dateLabel}))].map(o=>`<option value="${o.value}">${o.label}</option>`).join("");
 const map=L.map("overviewMap");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"&copy; OpenStreetMap"}).addTo(map);
-let markers=[],polylines=[]; function addArrow(latlng,color){const icon=L.divIcon({className:"",html:`<div style="color:${color};font-size:16px;font-weight:700;transform:translate(-50%,-50%);">➜</div>`,iconSize:[16,16],iconAnchor:[8,8]}); return L.marker(latlng,{icon,interactive:false}).addTo(map);}
-function renderCards(selected){const visible=selected==="all"?days:[days[Number(selected)]];root.innerHTML=visible.map((d)=>{const spotItems=d.route.map((p)=>`<li><strong>${p}</strong><div class="spot-note">${placeIntro[p]||"行程景點"}</div></li>`).join(""); return `<article class="day"><div class="head"><h3>${d.title}</h3><p>${d.stay}</p></div><div class="body"><ol>${spotItems}</ol><iframe class="map" loading="lazy" src="${embedUrl(d.route)}"></iframe><div class="actions"><a class="btn primary" href="${dirUrl(d.route)}" target="_blank" rel="noopener">開啟路線導航</a><a class="btn" href="${d.hotelUrl}" target="_blank" rel="noopener">住宿連結</a></div></div></article>`;}).join("");}
+let markers=[],polylines=[];
+function addArrow(latlng,color){const icon=L.divIcon({className:"",html:`<div style="color:${color};font-size:16px;font-weight:700;transform:translate(-50%,-50%);">➜</div>`,iconSize:[16,16],iconAnchor:[8,8]}); return L.marker(latlng,{icon,interactive:false}).addTo(map);}
+
+function renderCards(selected){
+  const visible=selected==="all"?days:[days[Number(selected)]];
+  root.innerHTML=visible.map((d,i)=>{const spotItems=d.route.map((p)=>`<li><strong>${p}</strong><div class="spot-note">${placeIntro[p]||"行程景點"}</div></li>`).join(""); const weatherKey=selected==="all"?String(i):String(Number(selected)); return `<article class="day"><div class="head"><div class="head-top"><h3>${d.title}</h3><div class="wx-badge" id="wx-${weatherKey}">天氣載入中...</div></div><p>${d.stay}</p></div><div class="body"><ol>${spotItems}</ol><iframe class="map" loading="lazy" src="${embedUrl(d.route)}"></iframe><div class="actions"><a class="btn primary" href="${dirUrl(d.route)}" target="_blank" rel="noopener">開啟路線導航</a><a class="btn" href="${d.hotelUrl}" target="_blank" rel="noopener">住宿連結</a></div></div></article>`;}).join("");
+  renderWeather(selected);
+}
+
 function renderOverview(selected){[...markers,...polylines].forEach(l=>map.removeLayer(l));markers=[];polylines=[];const visible=selected==="all"?days:[days[Number(selected)]];const allPoints=[];visible.forEach((d,dayIdx)=>{const color=colors[dayIdx%colors.length],rc=d.route.map((p)=>placeCoords[p]).filter(Boolean);d.route.forEach((p,idx)=>{const c=placeCoords[p];if(!c)return;markers.push(L.circleMarker(c,{radius:7,color,weight:2,fillColor:"#fff",fillOpacity:1}).addTo(map).bindPopup(`${d.title}<br>${idx+1}. ${p}`));allPoints.push(c)});if(rc.length>=2){polylines.push(L.polyline(rc,{color,weight:4,opacity:.85}).addTo(map));for(let i=0;i<rc.length-1;i++){const mid=[(rc[i][0]+rc[i+1][0])/2,(rc[i][1]+rc[i+1][1])/2];polylines.push(addArrow(mid,color));}}});if(allPoints.length)map.fitBounds(allPoints,{padding:[30,30]});overviewTitle.textContent=selected==="all"?"6日總地圖（全部景點 + 路線）":`總地圖（${visible[0].dateLabel}）`;setTimeout(()=>map.invalidateSize(),50)}
+
+async function fetchDayWeather(day){
+  const [lat,lon]=day.weatherPoint;
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&start_date=${day.date}&end_date=${day.date}`;
+  const res=await fetch(url,{cache:"no-store"});
+  if(!res.ok) throw new Error("wx_fetch_failed");
+  const data=await res.json();
+  return {tMin:data?.daily?.temperature_2m_min?.[0],tMax:data?.daily?.temperature_2m_max?.[0],rain:data?.daily?.precipitation_probability_max?.[0]};
+}
+
+async function renderWeather(selected){
+  const indexes=selected==="all"?days.map((_,i)=>i):[Number(selected)];
+  await Promise.all(indexes.map(async(i)=>{const el=document.getElementById(`wx-${i}`); if(!el) return; try{const w=await fetchDayWeather(days[i]); const min=Number.isFinite(w.tMin)?Math.round(w.tMin):"-"; const max=Number.isFinite(w.tMax)?Math.round(w.tMax):"-"; const rain=Number.isFinite(w.rain)?Math.round(w.rain):"-"; el.innerHTML=`${min}°C - ${max}°C<br>落雨機會 ${rain}%`; }catch{ el.textContent="天氣資料稍後"; }}));
+}
+
 const render=(s)=>{renderOverview(s);renderCards(s)};filterEl.addEventListener("change",(e)=>render(e.target.value));render("all");
 function flightLinkHtml(f){return `<a class="flight-link" href="https://www.flightaware.com/live/flight/${f}" target="_blank" rel="noopener">FlightAware ${f}</a>`;}
 async function fetchFlightStatusViaProxy(f){if(!FLIGHT_PROXY_BASE)throw new Error("proxy_not_configured");const base=FLIGHT_PROXY_BASE.replace(/\/+$/,"");const r=await fetch(`${base}/status?flight=${encodeURIComponent(f)}`,{cache:"no-store"});if(!r.ok)throw new Error(`proxy_http_${r.status}`);const d=await r.json();if(d.error)throw new Error(d.error);return d;}
